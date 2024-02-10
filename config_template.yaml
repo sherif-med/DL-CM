@@ -1,0 +1,105 @@
+
+## Experiments section
+### Mainly for paths to use for experiments like logging path and checpointing
+
+experiment_name: &ex_name Ex1
+experiment_checkpoint_directory: &ex_ck_dir ./Trials/Ex1/checkpoints/
+experiment_logging_directory: &ex_log_dir ./Trials/Ex1/tensorboard_logs/
+
+
+## Data section
+### Mainly for train, eval, test dataset specification like (paths, split ratio, augmentations, preprocessing, ...)
+
+datainfo:
+  preprocessing: zscore
+  apply_augmentation: False
+
+  datasets:
+    - name: train/val
+      split_ratio: [0.8, 0.2]
+      augmentations:
+        - id
+        - rot90
+        - fliplr
+      
+      datasettype:
+        type: LabeledImagesDataset
+        params: 
+          root_folder: DATA_SANDBOX/train_val
+    
+    - name: test
+      datasettype: 
+        name: UnlabeledImagesDataset
+        params: 
+          root_folder: DATA_SANDBOX/test
+      preprocessing: null # zscore
+  
+  common_loaders_params:
+    num_workers: 4
+    batch_size: 10
+    shuffle: False
+    drop_last: False
+    collate_fn: null
+
+  dataloaders:
+    - name: train
+      respective_dataset_name: train
+      params:
+        shuffle: True
+        drop_last: True
+    
+    - name: val
+      respective_dataset_name: val
+      params:
+        shuffle: False
+        drop_last: True
+    
+    - name: test
+      respective_dataset_name: test
+      params: null
+
+
+## Trainer section
+### Mainly for pytorch trainer params
+trainer:
+  params:
+    accelerator: cuda
+    max_epochs: 30
+    enable_progress_bar: True
+  callbacks:
+    - name: ModelCheckpoint
+      params:
+        monitor: val_iou
+        dirpath: *ex_ck_dir
+        filename: "ckpt-{epoch:02d}-{val_iou:.2f}"
+        save_top_k: 2
+        mode: max
+        save_weights_only: False
+    
+    - name: TQDMProgressBar
+      params:
+        refresh_rate: 10
+    
+    #- name: BoundingBoxPlottingCallback
+    #  params: null
+  
+  loggers:
+    - name: TensorBoardLogger
+      params:
+        save_dir: *ex_log_dir
+        name: *ex_name
+    
+## Task section
+### Mainly related to task to perform from availble tasks like segmentation, classification, etc
+task:
+  optimizer:
+    name: Adam
+    params:
+      lr: 0.1
+  model:
+    params:
+      in_features: 3
+      out_features: 2
+      encoder_params: null
+      decoder_params: null 
+
