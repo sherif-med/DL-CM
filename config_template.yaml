@@ -92,14 +92,15 @@ trainer:
 ## Task section
 ### Mainly related to task to perform from availble tasks like segmentation, classification, etc
 task:
-  optimizer:
-    name: Adam
-    params:
-      lr: 0.1
-  model:
-    params:
-      in_features: 3
-      out_features: 2
-      encoder_params: null
-      decoder_params: null 
+  name: SimpleSupervisedSegmentation
+
+  task_def:
+    in_features: 3
+    out_features: 2
+    encoder_params: null
+    decoder_params: null  
+    optimizer:
+      name: Adam
+      params:
+        lr: 0.1
 
