@@ -1,0 +1,49 @@
+# Define the root keys with their types
+experiment_name: str()
+experiment_checkpoint_directory: str()
+experiment_logging_directory: str()
+
+datainfo:
+  preprocessing: str(required=False)
+  apply_augmentation: bool(required=False)
+  datasets: list(include('dataset'))
+  common_loaders_params:
+    num_workers: int(required=False)
+    batch_size: int(required=False)
+    shuffle: bool(required=False)
+    drop_last: bool(required=False)
+    collate_fn: str(required=False)
+  dataloaders: list(include('dataloader'))
+
+trainer:
+  params: include('params')
+  callbacks: list(include('named_entity'))
+  loggers: list(include('named_entity'))
+
+task:
+  name: registered_task()
+  task_def: include('params')
+  optimizer: 
+    name: registered_optimizer()
+    params: include('params')
+
+# Define reusable components
+---
+dataset:
+  name: str()
+  split_ratio: list(num(),required=False)
+  augmentations: list(str(), required=False)
+  datasettype: include('named_entity')
+  preprocessing: str(required=False)
+
+dataloader:
+  name: str()
+  respective_dataset_name: str()
+  params: include('params')
+
+params:  # Reusable component for params
+  map(any(), required=False)
+
+named_entity:
+  name: str()
+  params: include('params')
