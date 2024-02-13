@@ -1,5 +1,6 @@
 #
 import logging
+import os
 
 package_logger_name = "dl_cm_logger"
 _logger = logging.getLogger(package_logger_name)
@@ -26,3 +27,13 @@ def configure_logging(log_level: int):
     return
 
 configure_logging(logging.INFO)
+
+def get_schema_path():
+    #### Schema file path setting
+    # Get the directory of the current script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # Move up one directory from the current script's directory
+    parent_dir = os.path.dirname(current_dir)
+    # Append 'schema.yaml' to this parent directory
+    schema_path = os.path.join(parent_dir, "schema.yaml")
+    return schema_path
