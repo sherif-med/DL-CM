@@ -23,7 +23,7 @@ datainfo:
         - fliplr
       
       datasettype:
-        type: LabeledImagesDataset
+        name: LabeledImagesDataset
         params: 
           root_folder: DATA_SANDBOX/train_val
     
@@ -99,8 +99,8 @@ task:
     out_features: 2
     encoder_params: null
     decoder_params: null  
-    optimizer:
-      name: Adam
-      params:
-        lr: 0.1
+  optimizer:
+    name: Adam
+    params:
+      lr: 0.1
 
