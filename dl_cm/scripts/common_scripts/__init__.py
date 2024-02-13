@@ -34,7 +34,7 @@ def checkpoint_path_option(short_name="-c", long_name="--ckpt_path")->click.Opti
 
 def config_file_option(short_name="-k", long_name="--config_path")->click.Option:
     return click.option(short_name, long_name, type=click.Path(exists=True, dir_okay=False),
-                        help="Config file path!")
+                        required=True, help="Config file path!")
 
 
 from collections.abc import Iterable
