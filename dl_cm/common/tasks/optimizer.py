@@ -9,3 +9,9 @@ def load_optimizer_from_config(model_params, optimizer_config:dict)-> Optimizer:
     optimizer_params = optimizer_config.get("params")
     return optimizer_cls(model_params, **optimizer_params)
     
+
+from torch.optim import SGD, Adam, AdamW
+
+OPTIMIZER_REGiSTERY.register(SGD, "SGD")
+OPTIMIZER_REGiSTERY.register(Adam, "Adam")
+OPTIMIZER_REGiSTERY.register(AdamW, "AdamW")
