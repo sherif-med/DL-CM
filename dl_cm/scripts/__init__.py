@@ -1,0 +1,2 @@
+from .common_scripts.base_training_command import BaseTrainingCommand
+from .common_scripts.base_prediction_command import BasePredictionCommand 
