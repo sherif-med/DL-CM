@@ -3,7 +3,10 @@ from dl_cm.common.datasets.augmented_dataset import AugmentedDataset
 from dl_cm.common.datasets.preprocessed_dataset import PreprocessedDataset
 from dl_cm.common.datasets.split_datasets import split_subdatasets_random
 from torch.utils.data import DataLoader
+import pytorch_lightning as pl
 from dl_cm import _logger
+from functools import partial
+from dl_cm.common.datasets.datamodule import PartialDataModule
 
 default_augmentations = set(("id",))
 
@@ -51,7 +54,7 @@ def datasets_from_config(datainfo_config:dict):
     return datasets_map
         
 
-def datamodule_from_config(datainfo_config:dict):
+def datamodule_from_config(datainfo_config:dict)->pl.LightningDataModule:
     """
     Returns a map of dataloaders using datainfo section
     """
@@ -59,12 +62,14 @@ def datamodule_from_config(datainfo_config:dict):
     
     common_loaders_params = datainfo_config.get("common_loaders_params", {})
     
-    dataloaders_map = {}
+    partial_dataloaders_map = {}
     
     for c_dataloader_info in datainfo_config.get("dataloaders"):
         c_loader_params = common_loaders_params.update(c_dataloader_info.get("params"))
-        dataloaders_map[c_dataloader_info.get("name")] = DataLoader(
+        partial_dataloaders_map[c_dataloader_info.get("name")] = partial(DataLoader,
             datasets_map[c_dataloader_info.get("respective_dataset_name")],
             **c_loader_params
             )
     
+    loaded_datamodule = PartialDataModule(**partial_dataloaders_map)
+    return loaded_datamodule    
