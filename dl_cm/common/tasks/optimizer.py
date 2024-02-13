@@ -1,4 +1,4 @@
-from src.utils.registery import Registry
+from dl_cm.utils.registery import Registry
 from torch.optim import Optimizer
 
 OPTIMIZER_REGiSTERY = Registry("Optimizer")

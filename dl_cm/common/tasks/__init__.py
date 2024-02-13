@@ -1,4 +1,4 @@
-from src.utils.registery import Registry
+from dl_cm.utils.registery import Registry
 import torch
 import pytorch_lightning as pl
 from .base_task import BaseTask

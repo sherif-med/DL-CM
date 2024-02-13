@@ -1,11 +1,9 @@
-
-
-from src.common.datasets import DATASETS_REGISTERY
-from src.common.datasets.augmented_dataset import AugmentedDataset
-from src.common.datasets.preprocessed_dataset import PreprocessedDataset
-from src.common.datasets.split_datasets import split_subdatasets_random
+from dl_cm.common.datasets import DATASETS_REGISTERY
+from dl_cm.common.datasets.augmented_dataset import AugmentedDataset
+from dl_cm.common.datasets.preprocessed_dataset import PreprocessedDataset
+from dl_cm.common.datasets.split_datasets import split_subdatasets_random
 from torch.utils.data import DataLoader
-from src import _logger
+from dl_cm import _logger
 
 default_augmentations = set(("id",))
 

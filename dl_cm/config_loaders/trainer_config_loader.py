@@ -1,7 +1,7 @@
 from typing import List
 import pytorch_lightning as pl
-from src.common.trainers.callbacks import CALLBACKS_REGISTERY
-from src.common.trainers.loggers import LOGGERS_REGISTERY
+from dl_cm.common.trainers.callbacks import CALLBACKS_REGISTERY
+from dl_cm.common.trainers.loggers import LOGGERS_REGISTERY
 
 
 def callbacks_from_config(trainer_config:dict) -> List[pl.Callback]:

@@ -1,5 +1,5 @@
 
-from src.utils.registery import Registry
+from dl_cm.utils.registery import Registry
 from typing import Union, Callable
 
 PREPROCESSING_REGISTERY = Registry("Preprocessing")

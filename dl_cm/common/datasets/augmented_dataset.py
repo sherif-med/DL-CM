@@ -1,5 +1,5 @@
 import copy
-from src.utils.registery import Registry
+from dl_cm.utils.registery import Registry
 from . import CompositionDataset
 
 AUGMENTATION_TRANSFORMATION_REGISTERY = Registry("Augmentation transformation")
