@@ -7,12 +7,7 @@ datainfo:
   preprocessing: registered_preprocessing(required=False)
   apply_augmentation: bool(required=False)
   datasets: list(include('dataset'))
-  common_loaders_params:
-    num_workers: int(required=False)
-    batch_size: int(required=False)
-    shuffle: bool(required=False)
-    drop_last: bool(required=False)
-    collate_fn: str(required=False)
+  common_loaders_params: include('common_loaders_params', required=False)
   dataloaders: list(include('dataloader'))
 
 trainer:
@@ -50,6 +45,13 @@ logger:
   params: include('params')
 params:  # Reusable component for params
   map(any(), required=False)
+
+common_loaders_params:
+  num_workers: int(required=False)
+  batch_size: int(required=False)
+  shuffle: bool(required=False)
+  drop_last: bool(required=False)
+  collate_fn: str(required=False)
 
 named_entity:
   name: str()
