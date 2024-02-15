@@ -65,7 +65,8 @@ def datamodule_from_config(datainfo_config:dict)->pl.LightningDataModule:
     partial_dataloaders_map = {}
     
     for c_dataloader_info in datainfo_config.get("dataloaders"):
-        c_loader_params = common_loaders_params.update(c_dataloader_info.get("params"))
+        c_loader_params = dict(common_loaders_params)
+        c_loader_params.update(c_dataloader_info.get("params"))
         partial_dataloaders_map[c_dataloader_info.get("name")] = partial(DataLoader,
             datasets_map[c_dataloader_info.get("respective_dataset_name")],
             **c_loader_params
