@@ -17,6 +17,8 @@ trainer:
 
 task:
   name: registered_task()
+  model:
+    params: include('params')
   task_def: include('params')
   optimizer: 
     name: registered_optimizer()
