@@ -4,7 +4,7 @@ experiment_checkpoint_directory: str()
 experiment_logging_directory: str()
 
 datainfo:
-  preprocessing: str(required=False)
+  preprocessing: registered_preprocessing(required=False)
   apply_augmentation: bool(required=False)
   datasets: list(include('dataset'))
   common_loaders_params:
