@@ -23,6 +23,11 @@ task:
   optimizer: 
     name: registered_optimizer()
     params: include('params')
+  critireon:
+    name: str(required=False)
+    log_on_epoch: bool(required=False)
+    log_on_step: bool(required=False)
+    def: list(include('loss'))
 
 # Define reusable components
 ---
