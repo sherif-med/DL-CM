@@ -4,6 +4,9 @@ from typing import Union, Callable
 
 PREPROCESSING_REGISTERY = Registry("Preprocessing")
 
+PREPROCESSING_REGISTERY.register(lambda x:x, "id")
+PREPROCESSING_REGISTERY.register(lambda x:x, None)
+
 class PreprocessedDataset:
     
     def __init__(self, parent_dataset, preprocessing_fn: Union[str, Callable] = "id"):
