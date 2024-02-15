@@ -28,6 +28,9 @@ task:
     log_on_epoch: bool(required=False)
     log_on_step: bool(required=False)
     def: list(include('loss'))
+  metrics:
+    train_mode: include('metric_mode')
+    valid_mode: include('metric_mode')
 
 # Define reusable components
 ---
