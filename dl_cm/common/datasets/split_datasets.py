@@ -45,7 +45,7 @@ def split_subdatasets_random(parent_dataset, fractions):
                 if idx < 0 or idx >= len(self):
                     raise IndexError("Index out of range")
                 real_idx = self.indices[idx]
-                return super().__getitem__(real_idx)
+                return self.parent_dataset.__getitem__(real_idx)
         
         # Create a new subdataset instance for the current subset of indices
         subdatasets.append(SubDataset(parent_dataset, sub_indices))
