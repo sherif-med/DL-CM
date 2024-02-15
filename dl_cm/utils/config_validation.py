@@ -3,8 +3,8 @@ from dl_cm import get_schema_path
 from functools import partial
 from yamale.validators import DefaultValidators, Validator
 
-from dl_cm.common import TASKS_REGISTERY, LOGGERS_REGISTERY, DATASETS_REGISTERY, \
-    CALLBACKS_REGISTERY, OPTIMIZER_REGiSTERY, PREPROCESSING_REGISTERY, AUGMENTATION_TRANSFORMATION_REGISTERY
+from dl_cm.common import TASKS_REGISTERY, LOGGERS_REGISTERY, DATASETS_REGISTERY, CRITIREON_REGISTRY, \
+    CALLBACKS_REGISTERY, OPTIMIZER_REGiSTERY, PREPROCESSING_REGISTERY, AUGMENTATION_TRANSFORMATION_REGISTERY, METRICS_REGISTRY
 
 class RegistryValidator(Validator):
     """Custom validator for checking named entities against a registry."""
@@ -29,6 +29,8 @@ registries_validators = {
     "registered_optimizer": OPTIMIZER_REGiSTERY,
     "registered_preprocessing": PREPROCESSING_REGISTERY,
     "registered_augtrans": AUGMENTATION_TRANSFORMATION_REGISTERY,
+    "registered_critireon": CRITIREON_REGISTRY,
+    "registered_metric": METRICS_REGISTRY,
 }
 
 
