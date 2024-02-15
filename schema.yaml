@@ -17,8 +17,8 @@ datainfo:
 
 trainer:
   params: include('params')
-  callbacks: list(include('named_entity'))
-  loggers: list(include('named_entity'))
+  callbacks: list(include('callback'))
+  loggers: list(include('logger'))
 
 task:
   name: registered_task()
@@ -41,6 +41,13 @@ dataloader:
   respective_dataset_name: str()
   params: include('params')
 
+callback:
+  name: registered_callback()
+  params: include('params')
+
+logger:
+  name: registered_logger()
+  params: include('params')
 params:  # Reusable component for params
   map(any(), required=False)
 
