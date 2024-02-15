@@ -1,8 +1,10 @@
 import pytorch_lightning as pl
 
 class BaseTask(pl.LightningModule):
-    def __init__(self):
+    def __init__(self, task_config:dict):
         super().__init__()
+        self.task_config: dict = task_config
+        self.save_hyperparameters(task_config)
         # Set the task name to the name of the current class
         self.hparams["task_name"] = type(self).__name__
         # Call the post initialization method
