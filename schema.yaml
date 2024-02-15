@@ -27,9 +27,11 @@ task:
 dataset:
   name: str()
   split_ratio: list(num(),required=False)
-  augmentations: list(str(), required=False)
-  datasettype: include('named_entity')
-  preprocessing: str(required=False)
+  augmentations: list(registered_augtrans(), required=False)
+  datasettype: 
+    name: registered_dataset()
+    params: include('params')
+  preprocessing: registered_preprocessing(required=False)
 
 dataloader:
   name: str()
