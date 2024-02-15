@@ -12,8 +12,7 @@ def load_task_from_config(task_config:dict)->BaseTask:
     Returns a predefined task loaded using config
     """    
     task_cls = TASKS_REGISTERY.get(task_config.get("name"))
-    task_def = task_config.get("task_def")
-    loaded_task = task_cls(task_def)
+    loaded_task = task_cls(task_config)
     return loaded_task
 
 
