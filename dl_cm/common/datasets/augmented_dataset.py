@@ -1,14 +1,16 @@
 import copy
 from dl_cm.utils.registery import Registry
 from . import CompositionDataset
+from collections.abc import Iterable
 
 AUGMENTATION_TRANSFORMATION_REGISTERY = Registry("Augmentation transformation")
+AUGMENTATION_TRANSFORMATION_REGISTERY.register(lambda x:x, "id")
 
 class AugmentedDataset(CompositionDataset):
     
-    def __init__(self, parent_dataset, augmentations=("id",)):
+    def __init__(self, parent_dataset, augmentations:Iterable=("id",)):
         CompositionDataset.__init__(self, parent_dataset)
-        if isinstance(augmentations[0], str):
+        if isinstance(next(iter(augmentations)), str):
             augmentations = [AUGMENTATION_TRANSFORMATION_REGISTERY.get(k) for k in augmentations]
         self.augmentations = augmentations
     
