@@ -43,6 +43,23 @@ callback:
 logger:
   name: registered_logger()
   params: include('params')
+
+loss:
+  name: registered_critireon()
+  params: include('params')
+  weight: num(min=0)
+  log_on_epoch: bool(required=False)
+  log_on_step: bool(required=False)
+
+metric:
+  name: registered_metric()
+  params: include('params')
+
+metric_mode:
+  log_on_epoch: bool(required=False)
+  log_on_step: bool(required=False)
+  defs: list(include('metric'))
+
 params:  # Reusable component for params
   map(any(), required=False)
 
