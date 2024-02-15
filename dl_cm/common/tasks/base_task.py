@@ -33,4 +33,7 @@ class BaseTask(pl.LightningModule):
         else:
             # Return a default message or raise an error if DESCRIPTION is not defined
             return "No description provided."
-
+    
+    def step(self, batch) -> dict:
+        raise NotImplementedError
+    
