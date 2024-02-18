@@ -42,11 +42,12 @@ class BaseTask(pl.LightningModule):
         
         losses_dict = step_output["losses"]
         preds = step_output["preds"]
-        targets = step_output["targets"]
+        targets = step_output["target"]
         
         for (loss_name, loss_value) in losses_dict.items():
+            self.train_loss_metrics[loss_name].update(loss_value)
             if self.train_metrics_log_flags.get(loss_name).get("log_on_step"):
-                self.train_loss_metrics[loss_name].update(loss_value)
+                self.log(f"train_{loss_name}", loss_value)
         
         metrics_output = self.train_metrics(preds=preds, target=targets)
         
@@ -57,33 +58,34 @@ class BaseTask(pl.LightningModule):
         
         losses_dict = step_output["losses"]
         preds = step_output["preds"]
-        targets = step_output["targets"]
+        targets = step_output["target"]
         
         for (loss_name, loss_value) in losses_dict.items():
+            self.valid_loss_metrics[loss_name].update(loss_value)
             if self.valid_metrics_log_flags.get(loss_name).get("log_on_step"):
-                self.valid_loss_metrics[loss_name].update(loss_value)
+                self.log(f"valid_{loss_name}", loss_value)
         
-        metrics_output = self.val_metrics(preds=preds, target=targets)
+        metrics_output = self.valid_metrics(preds=preds, target=targets)
         
         self.log_dict(metrics_output)
         return losses_dict["total_loss"]
         
-    def on_valid_epoch_end(self, outputs):
+    def on_validation_epoch_end(self):
         for c_loss_name, c_loss_metric in self.valid_loss_metrics.items():
             if self.valid_metrics_log_flags.get(c_loss_name).get("log_on_epoch"):
                 c_loss_value = c_loss_metric.compute()
-                self.log(c_loss_name, c_loss_value)
+                self.log(f"valid_{c_loss_name}", c_loss_value)
             c_loss_metric.reset()
             
-        metrics_epoch = self.val_metrics.compute()
+        metrics_epoch = self.valid_metrics.compute()
         self.log_dict(metrics_epoch)        
-        self.val_metrics.reset()
+        self.valid_metrics.reset()
     
-    def on_train_epoch_end(self, outputs):
+    def on_train_epoch_end(self):
         for c_loss_name, c_loss_metric in self.train_loss_metrics.items():
             if self.train_metrics_log_flags.get(c_loss_name).get("log_on_epoch"):
                 c_loss_value = c_loss_metric.compute()
-                self.log(c_loss_name, c_loss_value)
+                self.log(f"train_{c_loss_name}", c_loss_value)
             c_loss_metric.reset()
             
         metrics_epoch = self.train_metrics.compute()
