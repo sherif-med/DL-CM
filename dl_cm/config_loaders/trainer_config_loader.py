@@ -32,12 +32,15 @@ def loggers_from_config(trainer_config:dict):
         )
     return loaded_loggers
 
-def trainer_from_config(trainer_config:dict) -> pl.Trainer:
+def trainer_from_config(trainer_config:dict, extra_callbacks=tuple(), extra_plugins=tuple(), trainer_kwargs={}) -> pl.Trainer:
     """
     Returns a pre configured trainer using config
     """    
     callbacks = callbacks_from_config(trainer_config)
     loggers = loggers_from_config(trainer_config)    
-    kwargs = trainer_config.get("params", {}) | { "callbacks": callbacks, "logger": loggers }    
+    kwargs = trainer_config.get("params", {}) | { "callbacks": callbacks+list(extra_callbacks), "logger": loggers }
+    kwargs.update(trainer_kwargs)
+    if len(extra_plugins)!=0:
+        kwargs.update({"plugins": list(extra_plugins)})
     trainer = pl.Trainer(**kwargs)
     return trainer
