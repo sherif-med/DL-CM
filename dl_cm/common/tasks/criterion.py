@@ -20,7 +20,7 @@ class CombinedLoss(nn.Module):
         # Iterate over each loss function and corresponding weight
         for loss_fn, weight in zip(self.losses, self.weights):
             c_loss_value = loss_fn(prediction, target)
-            losses_dict[loss_fn.name] = c_loss_value
+            losses_dict[loss_fn.__class__.__name__] = c_loss_value
             total_loss += c_loss_value * weight
         losses_dict["total_loss"] = total_loss
         return losses_dict
