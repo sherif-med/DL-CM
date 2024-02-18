@@ -27,4 +27,4 @@ def init_metric_collection_from_config(metrics_config)->Tuple[MetricCollection]:
     train_mode_config = metrics_config.get("train_mode")
     valid_mode_config = metrics_config.get("valid_mode")
     
-    return init_mode_config(train_mode_config.get("defs"), prefix="train_"), init_mode_config(valid_mode_config.get("defs"), prefix="val_")
+    return init_mode_config(train_mode_config.get("defs"), prefix="train_"), init_mode_config(valid_mode_config.get("defs"), prefix="valid_")
