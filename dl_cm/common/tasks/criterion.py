@@ -57,12 +57,12 @@ def init_loss_metrics_dict_from_config(critireon_config)->Tuple[nn.ModuleDict, d
     
     critireon_def = critireon_config.get("def") 
     
-    for c_loss_def in critireon_def:
-        metrics_log_flags[c_loss_def.get("name")] = {
+    for c_loss_name, c_loss_def in critireon_def.items():
+        metrics_log_flags[c_loss_name] = {
             "log_on_epoch":c_loss_def.get("log_on_epoch", True),
             "log_on_step":c_loss_def.get("log_on_step", False)
         }
-        metrics_elements[c_loss_def.get("name")] = MeanMetric()
+        metrics_elements[c_loss_name] = MeanMetric()
     
     loss_metrics = nn.ModuleDict(metrics_elements)
     return loss_metrics, metrics_log_flags
