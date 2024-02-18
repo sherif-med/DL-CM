@@ -27,7 +27,7 @@ task:
     name: str(required=False)
     log_on_epoch: bool(required=False)
     log_on_step: bool(required=False)
-    def: list(include('loss'))
+    def: map(include('loss'), key=registered_critireon())
   metrics:
     train_mode: include('metric_mode')
     valid_mode: include('metric_mode')
@@ -57,7 +57,6 @@ logger:
   params: include('params')
 
 loss:
-  name: registered_critireon()
   params: include('params')
   weight: num(min=0)
   log_on_epoch: bool(required=False)
