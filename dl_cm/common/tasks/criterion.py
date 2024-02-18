@@ -30,8 +30,8 @@ def load_critireon_from_config(critireon_config)->CombinedLoss:
     critireon_def = critireon_config.get("def")    
     sub_losses = []
     sub_weight = []    
-    for c_loss_def in critireon_def:
-        sub_losses.append(CRITIREON_REGISTRY.get(c_loss_def.get("name"))(**c_loss_def.get("params")))
+    for c_loss_name, c_loss_def in critireon_def.items():
+        sub_losses.append(CRITIREON_REGISTRY.get(c_loss_name)(**c_loss_def.get("params")))
         sub_weight.append(c_loss_def.get("weight"))
     
     return CombinedLoss(sub_losses, sub_weight)
