@@ -2,6 +2,7 @@ import yamale
 from dl_cm import get_schema_path
 from functools import partial
 from yamale.validators import DefaultValidators, Validator
+from dl_cm.config_loaders import open_config_file
 
 from dl_cm.common import TASKS_REGISTERY, LOGGERS_REGISTERY, DATASETS_REGISTERY, CRITIREON_REGISTRY, \
     CALLBACKS_REGISTERY, OPTIMIZER_REGiSTERY, PREPROCESSING_REGISTERY, AUGMENTATION_TRANSFORMATION_REGISTERY, METRICS_REGISTRY
@@ -48,7 +49,8 @@ def validate_config(config_path, registry_validation=False):
     """"""
     config_schema = yamale.make_schema(get_schema_path(), validators=extended_validators() if registry_validation else None)
     
-    data = yamale.make_data(config_path)
+    #data = yamale.make_data(config_path)
+    data = [(open_config_file(config_path), config_path)]
 
     try:
         yamale.validate(config_schema, data)
