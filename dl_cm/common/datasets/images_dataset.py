@@ -49,7 +49,7 @@ class ImagesWithinDirectoryDataset(CompositionDataset):
         item_fp = self.parent_dataset[index]
         item = {
             "id":item_fp,
-            self.IMAGE_KEY:self.read_image(item_fp)
+            self.IMAGE_KEY:self.read_image(item_fp).float()
         }
         return item
     
