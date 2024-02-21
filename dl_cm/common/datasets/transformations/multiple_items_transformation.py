@@ -18,7 +18,7 @@ class MultipleItemRevrsibleTransformation(GeneralRevrsibleTransformation):
                  ignored_keys:Optional[Union[Iterable,Callable]]=None):
         self.parent_transformation=parent_transformation
         
-        if bool(included_keys) == bool(ignored_keys):
+        if bool(included_keys) and bool(ignored_keys):
             raise Exception("Include and exclude arguments are provided at the same time")
         
         if callable(included_keys):
@@ -27,7 +27,9 @@ class MultipleItemRevrsibleTransformation(GeneralRevrsibleTransformation):
             included_keys = set(included_keys)
             self.included_keys = lambda x: x in included_keys
         elif included_keys is None:
-            if callable(ignored_keys):
+            if ignored_keys is None:
+                self.included_keys = lambda x:True
+            elif callable(ignored_keys):
                 self.included_keys = lambda x: not ignored_keys(v)
             elif is_iterable(ignored_keys):
                 ignored_keys = set(ignored_keys)
