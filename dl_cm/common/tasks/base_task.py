@@ -41,7 +41,7 @@ class BaseTask(pl.LightningModule):
     def training_step_end(self, step_output):
         
         losses_dict = step_output["losses"]
-        preds = step_output["preds"]
+        preds = step_output["preds"]["seg_map"] ## TODO remove segmap key 
         targets = step_output["target"]
         
         for (loss_name, loss_value) in losses_dict.items():
@@ -57,7 +57,7 @@ class BaseTask(pl.LightningModule):
     def validation_step_end(self, step_output):
         
         losses_dict = step_output["losses"]
-        preds = step_output["preds"]
+        preds = step_output["preds"]["seg_map"] ## TODO remove segmap key 
         targets = step_output["target"]
         
         for (loss_name, loss_value) in losses_dict.items():
