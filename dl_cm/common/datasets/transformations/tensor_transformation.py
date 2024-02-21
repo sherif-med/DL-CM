@@ -59,7 +59,7 @@ class Transflip(AlongDimensionTransformation, GeneralRevrsibleTransformation):
         if isinstance(item, np.ndarray):
             return np.take(item, indices=np.arange(item.shape[dimension_index])[::-1], axis=dimension_index)
         elif isinstance(item, torch.Tensor):
-            return torch.index_select( item, dimension_index, torch.arange(item.size(dimension_index)-1, -1, -1) )
+            return torch.index_select( item, dimension_index, torch.arange(item.size(dimension_index)-1, -1, -1).to(item.device) )
         else:
             raise OutOfTypesException(item, (np.ndarray, torch.Tensor))
         
