@@ -22,7 +22,7 @@ def pytorch_accelerator_option(short_name="-d", long_name="--device")->click.Opt
     default_accelerator = PytorchAcceleratorsEnum.CPU
     if torch.cuda.is_available():
         default_accelerator = PytorchAcceleratorsEnum.GPU
-    return click.option(short_name, long_name, type=click.Choice(PytorchAcceleratorsEnum.__members__), 
+    return click.option(short_name, long_name, type=click.Choice(PytorchAcceleratorsEnum.__members__, case_sensitive=False), 
               callback=lambda c, p, v: getattr(PytorchAcceleratorsEnum, v).value if v else None, default=default_accelerator.name,
               help="device to use pytorch operations!")
 
