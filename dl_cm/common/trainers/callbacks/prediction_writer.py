@@ -1,6 +1,6 @@
 from pathlib import Path
 from skimage.io import imsave
-from pytorch_lightning.callbacks import BasePredictionWriter
+from pytorch_lightning.callbacks import BasePredictionWriter, Callback
 import numpy as np
 import os
 
@@ -45,3 +45,16 @@ class ImagesPredictionWriter(BasePredictionWriter):
             trainer, pl_module, outputs, batch_indices, batch, batch_idx, dataloader_idx
             )
         
+class PostPredictionCallback(BasePredictionWriter):
+    
+    def __init__(self, output_dir, write_interval, preds_items_callback):
+        super().__init__(write_interval)
+        self.output_dir = output_dir
+        self.preds_items_callback = preds_items_callback
+        Path(self.output_dir).mkdir(exist_ok=True, parents=True)
+    
+    def write_on_batch_end(self, trainer, pl_module, prediction, batch_indices, batch, batch_idx, dataloader_idx):
+        """"""        
+        for c_pred_key, c_pred_callable in self.preds_items_callback.items():
+            c_pred = prediction["preds"][c_pred_key]
+            c_pred_callable(self.output_dir, c_pred, batch)
