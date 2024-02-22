@@ -28,3 +28,8 @@ def open_config_file(conf_file_path: str) -> dict :
     with open(conf_file_path, "r") as f:
         config = yaml.safe_load(f)
         return config
+
+def load_named_entity(registry, entity_config):
+    entity_cls = registry.get(entity_config.get("name"))
+    entity_params = entity_config.get("params")
+    return entity_cls(**entity_params)

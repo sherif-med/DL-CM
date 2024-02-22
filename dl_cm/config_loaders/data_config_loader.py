@@ -1,12 +1,13 @@
 from dl_cm.common.datasets import DATASETS_REGISTERY
 from dl_cm.common.datasets.augmented_dataset import AugmentedDataset
-from dl_cm.common.datasets.preprocessed_dataset import PreprocessedDataset
+from dl_cm.common.datasets.preprocessed_dataset import PreprocessedDataset, PREPROCESSING_REGISTERY
 from dl_cm.common.datasets.split_datasets import split_subdatasets_random
 from torch.utils.data import DataLoader
 import pytorch_lightning as pl
 from dl_cm import _logger
 from functools import partial
 from dl_cm.common.datasets.datamodule import PartialDataModule
+from dl_cm.config_loaders import load_named_entity
 
 default_augmentations = set(("id",))
 
@@ -17,19 +18,18 @@ def datasets_from_config(datainfo_config:dict):
     
     augmentation_switch = datainfo_config.get("apply_augmentation", True)
     
+    loaded_preprocessing = load_named_entity(PREPROCESSING_REGISTERY, datainfo_config.get("preprocessing"))
+    
     datasets_map = {}
     
     for c_dataset_info in datainfo_config.get("datasets"):
         # Iterate through every dataset definitions
         c_name = c_dataset_info.get("name")
-                
-        dataset_loader_info:dict = c_dataset_info.get("datasettype")        
-        loaded_dataset = DATASETS_REGISTERY.get(dataset_loader_info.get("name"))(
-            **dataset_loader_info.get("params")
-        )
+        
+        loaded_dataset = load_named_entity(DATASETS_REGISTERY, c_dataset_info.get("datasettype"))
         
         # Apply preprocessing
-        preprocessed_dataset = PreprocessedDataset(loaded_dataset, datainfo_config.get("preprocessing", "id"))
+        preprocessed_dataset = PreprocessedDataset(loaded_dataset, loaded_preprocessing)
         
         # Apply augmentation
         c_augmentations = set(c_dataset_info.get("augmentations", default_augmentations))
