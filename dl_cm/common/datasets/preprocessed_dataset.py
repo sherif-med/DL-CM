@@ -1,20 +1,32 @@
 
 from dl_cm.utils.registery import Registry
 from typing import Union, Callable
+from dl_cm.utils.exceptions import OutOfTypesException
 
 PREPROCESSING_REGISTERY = Registry("Preprocessing")
 
-PREPROCESSING_REGISTERY.register(lambda x:x, "id")
-PREPROCESSING_REGISTERY.register(lambda x:x, None)
+class PreprocessingBase:
+    pass
+
+class PreprocessingId(PreprocessingBase):
+    def __init__(self):
+        pass
+    def __call__(self, item):
+        return item
+
+PREPROCESSING_REGISTERY.register(PreprocessingId(), "id")
 
 class PreprocessedDataset:
     
-    def __init__(self, parent_dataset, preprocessing_fn: Union[str, Callable] = "id"):
+    def __init__(self, parent_dataset, preprocessing_fn: Union[str, PreprocessingBase] = "id"):
         super().__init__()
         self.parent_dataset = parent_dataset
         if isinstance(preprocessing_fn, str):
             preprocessing_fn = PREPROCESSING_REGISTERY.get(preprocessing_fn)
-        self.preprocessing_callable = preprocessing_fn
+        elif isinstance(preprocessing_fn, PreprocessingBase):
+            self.preprocessing_callable = preprocessing_fn
+        else:
+            raise OutOfTypesException(preprocessing_fn, (str, PreprocessingBase))
     
     def __len__(self):
         return len(self.parent_dataset)
