@@ -2,6 +2,7 @@ from typing import List
 import pytorch_lightning as pl
 from dl_cm.common.trainers.callbacks import CALLBACKS_REGISTERY
 from dl_cm.common.trainers.loggers import LOGGERS_REGISTERY
+from dl_cm.config_loaders import load_named_entity
 
 
 def callbacks_from_config(trainer_config:dict) -> List[pl.Callback]:
@@ -11,11 +12,8 @@ def callbacks_from_config(trainer_config:dict) -> List[pl.Callback]:
     loaded_callbacks = []
     
     for c_callback_def in trainer_config.get("callbacks", {}):
-        callback_cls = CALLBACKS_REGISTERY.get(c_callback_def.get("name"))
-        callback_params = c_callback_def.get("params")
-        loaded_callbacks.append(
-            callback_cls(**callback_params)
-        )
+        c_callback = load_named_entity(CALLBACKS_REGISTERY, c_callback_def)
+        loaded_callbacks.append(c_callback)
     return loaded_callbacks
 
 def loggers_from_config(trainer_config:dict):
