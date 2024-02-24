@@ -8,13 +8,13 @@ PREPROCESSING_REGISTERY = Registry("Preprocessing")
 class PreprocessingBase:
     pass
 
+@PREPROCESSING_REGISTERY.register(name="id")
 class PreprocessingId(PreprocessingBase):
     def __init__(self):
         pass
     def __call__(self, item):
         return item
 
-PREPROCESSING_REGISTERY.register(PreprocessingId(), "id")
 
 class PreprocessedDataset:
     
