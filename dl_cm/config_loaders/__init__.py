@@ -32,4 +32,5 @@ def open_config_file(conf_file_path: str) -> dict :
 def load_named_entity(registry, entity_config):
     entity_cls = registry.get(entity_config.get("name"))
     entity_params = entity_config.get("params")
+    if entity_params is None: entity_params = {}
     return entity_cls(**entity_params)
