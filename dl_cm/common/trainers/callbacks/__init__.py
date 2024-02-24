@@ -4,6 +4,8 @@ CALLBACKS_REGISTERY = Registry("Callbacks")
 
 from pytorch_lightning.callbacks.progress import TQDMProgressBar
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
+from pytorch_lightning.callbacks import LearningRateFinder
 
 CALLBACKS_REGISTERY.register(TQDMProgressBar)
 CALLBACKS_REGISTERY.register(ModelCheckpoint)
+CALLBACKS_REGISTERY.register(LearningRateFinder)

@@ -10,6 +10,7 @@ class BaseTask(pl.LightningModule):
         self.save_hyperparameters(task_config)
         # Set the task name to the name of the current class
         self.hparams["task_name"] = type(self).__name__
+        self.lr = task_config.get("optimizer").get("params").get("lr")
         
         self.criterion = load_critireon_from_config(self.task_config.get("critireon"))
         self.train_loss_metrics, self.train_metrics_log_flags = init_loss_metrics_dict_from_config(self.task_config.get("critireon"))
