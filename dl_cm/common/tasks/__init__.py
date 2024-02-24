@@ -16,11 +16,11 @@ def load_task_from_config(task_config:dict)->BaseTask:
     return loaded_task
 
 
-def load_task_from_checkpoint(ckpt_path:str)->BaseTask:
+def load_task_from_checkpoint(ckpt_path:str, **kwargs)->BaseTask:
     """"""
     ckpt = torch.load(ckpt_path)
     task_name = ckpt["hyper_parameters"]["name"]
     task_class:pl.LightningModule = TASKS_REGISTERY.get(task_name)
     del ckpt
-    loaded_task = task_class.load_from_checkpoint(ckpt_path)
+    loaded_task = task_class.load_from_checkpoint(ckpt_path, **kwargs)
     return loaded_task
