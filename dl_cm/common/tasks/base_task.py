@@ -1,7 +1,7 @@
 import pytorch_lightning as pl
 from dl_cm.common.tasks.metrics import init_metric_collection_from_config
 from dl_cm.common.tasks.criterion import init_loss_metrics_dict_from_config, load_critireon_from_config
-from dl_cm.common.tasks.optimizer import load_optimizer_from_config
+from dl_cm.common.tasks.optimizer import load_optimizer_from_config, load_lr_scheduler_from_config
 
 class BaseTask(pl.LightningModule):
     def __init__(self, task_config:dict):
@@ -36,7 +36,7 @@ class BaseTask(pl.LightningModule):
             # Return a default message or raise an error if DESCRIPTION is not defined
             return "No description provided."
     
-    def step(self, batch) -> dict:
+    def step(self, batch, compute_loss=True) -> dict:
         raise NotImplementedError
     
     def training_step_end(self, step_output):
@@ -94,4 +94,9 @@ class BaseTask(pl.LightningModule):
         self.train_metrics.reset()
     
     def configure_optimizers(self):
-        return load_optimizer_from_config(self.model.parameters(), self.task_config.get("optimizer"))
+        optimizer = load_optimizer_from_config(self.model.parameters(), self.task_config.get("optimizer"))
+        lr_scheduler = load_lr_scheduler_from_config(optimizer, self.task_config.get("lr_scheduler")) if self.task_config.get("lr_scheduler") else None
+        if lr_scheduler is None:
+            return optimizer
+        else:
+            return [optimizer], [lr_scheduler]
