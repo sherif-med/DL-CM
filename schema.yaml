@@ -25,6 +25,7 @@ task:
   optimizer: 
     name: registered_optimizer()
     params: include('params')
+  lr_scheduler: include('lr_scheduler', required=False)
   critireon:
     name: str(required=False)
     log_on_epoch: bool(required=False)
@@ -72,6 +73,10 @@ metric_mode:
   log_on_epoch: bool(required=False)
   log_on_step: bool(required=False)
   defs: list(include('metric'))
+
+lr_scheduler:
+  name: registered_scheduler()
+  params: include('params')
 
 params:  # Reusable component for params
   map(any(), required=False)

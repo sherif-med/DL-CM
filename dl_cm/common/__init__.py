@@ -7,6 +7,6 @@ from .trainers.callbacks import CALLBACKS_REGISTERY
 from .trainers.loggers import LOGGERS_REGISTERY
 
 from .tasks import TASKS_REGISTERY
-from .tasks.optimizer import OPTIMIZER_REGiSTERY
+from .tasks.optimizer import OPTIMIZER_REGiSTERY, LR_SCHEDULER_REGiSTERY
 from .tasks.criterion import CRITIREON_REGISTRY
 from .tasks.metrics import METRICS_REGISTRY
