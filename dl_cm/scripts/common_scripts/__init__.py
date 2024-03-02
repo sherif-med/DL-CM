@@ -8,6 +8,8 @@ def output_folder_option(short_name="-o", long_name="--output_folder")->click.Op
 def input_folder_option(short_name="-i", long_name="--input_folder")->click.Option:
     return click.option(short_name, long_name, type=click.Path(exists=True, file_okay=False) ,help="Input folder to run inference!")
 
+def seeding_option(short_name="-s", long_name="--seed")->click.Option:
+    return click.option(short_name, long_name, type=int, default=42 ,help="Seeding value, -1 cooresponds to no seeding")
 
 class PytorchAcceleratorsEnum(Enum):
     CPU = "cpu"
