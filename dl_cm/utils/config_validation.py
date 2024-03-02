@@ -5,7 +5,7 @@ from yamale.validators import DefaultValidators, Validator
 from dl_cm.config_loaders import open_config_file
 
 from dl_cm.common import TASKS_REGISTERY, LOGGERS_REGISTERY, DATASETS_REGISTERY, CRITIREON_REGISTRY, \
-    CALLBACKS_REGISTERY, OPTIMIZER_REGiSTERY, PREPROCESSING_REGISTERY, AUGMENTATION_TRANSFORMATION_REGISTERY, METRICS_REGISTRY, LR_SCHEDULER_REGiSTERY
+    CALLBACKS_REGISTERY, OPTIMIZER_REGiSTERY, PREPROCESSING_REGISTERY, TRANSFORMATION_REGISTRY, METRICS_REGISTRY, LR_SCHEDULER_REGiSTERY
 
 class RegistryValidator(Validator):
     """Custom validator for checking named entities against a registry."""
@@ -29,7 +29,7 @@ registries_validators = {
     "registered_callback": CALLBACKS_REGISTERY,
     "registered_optimizer": OPTIMIZER_REGiSTERY,
     "registered_preprocessing": PREPROCESSING_REGISTERY,
-    "registered_augtrans": AUGMENTATION_TRANSFORMATION_REGISTERY,
+    "registered_augtrans": TRANSFORMATION_REGISTRY,
     "registered_critireon": CRITIREON_REGISTRY,
     "registered_metric": METRICS_REGISTRY,
     "registered_scheduler": LR_SCHEDULER_REGiSTERY,
