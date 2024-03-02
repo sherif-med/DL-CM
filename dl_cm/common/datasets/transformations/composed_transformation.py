@@ -1,9 +1,14 @@
-from .general_transformation import GeneralRevrsibleTransformation
+from .general_transformation import GeneralTransformation, GeneralTransformationFactory
+from . import TRANSFORMATION_REGISTRY
 
-class ComposedTransformation(GeneralRevrsibleTransformation):
+@TRANSFORMATION_REGISTRY.register()
+class ComposedTransformation(GeneralTransformation):
     
     def __init__(self, *sub_transforms):
-        self.sub_transforms=list(sub_transforms)
+        self.sub_transforms = list()
+        for c_transform in sub_transforms:
+            self.sub_transforms.append(GeneralTransformationFactory.create(c_transform))
+        
     
     def __fwd__(self, item, **kwargs):
         out_item = item
