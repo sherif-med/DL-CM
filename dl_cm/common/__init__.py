@@ -1,5 +1,5 @@
 
-from .datasets.augmented_dataset import AUGMENTATION_TRANSFORMATION_REGISTERY
+from .datasets.transformations import TRANSFORMATION_REGISTRY
 from .datasets import DATASETS_REGISTERY
 from .datasets.preprocessed_dataset import PREPROCESSING_REGISTERY
 
