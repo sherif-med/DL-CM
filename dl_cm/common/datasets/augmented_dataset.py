@@ -4,9 +4,9 @@ from . import CompositionDataset
 from collections.abc import Iterable
 from dl_cm.common.datasets.transformations.general_transformation import GeneralRevrsibleTransformation
 
-AUGMENTATION_TRANSFORMATION_REGISTERY = Registry("Augmentation transformation")
+from .transformations import TRANSFORMATION_REGISTRY
 
-@AUGMENTATION_TRANSFORMATION_REGISTERY.register(name="id")
+@TRANSFORMATION_REGISTRY.register(name="id")
 class TransIdentity(GeneralRevrsibleTransformation):
     def identity(x):
         return x
@@ -22,7 +22,7 @@ class AugmentedDataset(CompositionDataset):
     def __init__(self, parent_dataset, augmentations:Iterable=("id",)):
         CompositionDataset.__init__(self, parent_dataset)
         if isinstance(next(iter(augmentations)), str):
-            augmentations = [AUGMENTATION_TRANSFORMATION_REGISTERY.get(k)() for k in augmentations]
+            augmentations = [TRANSFORMATION_REGISTRY.get(k)() for k in augmentations]
         self.augmentations = augmentations
     
     def __len__(self):
