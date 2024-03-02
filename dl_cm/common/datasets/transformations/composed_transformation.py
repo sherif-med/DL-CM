@@ -19,5 +19,5 @@ class ComposedTransformation(GeneralTransformation):
     def __rwd__(self, item, **kwargs):
         out_item = item
         for sub_t in self.sub_transforms[::-1]:
-            out_item = sub_t(out_item, **kwargs)
+            out_item = sub_t(out_item, reverse=True, **kwargs)
         return out_item
