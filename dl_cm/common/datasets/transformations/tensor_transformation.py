@@ -1,4 +1,5 @@
 from .general_transformation import GeneralRevrsibleTransformation
+from . import TRANSFORMATION_REGISTRY
 from functools import partial
 import numpy as np
 import torch
@@ -12,7 +13,7 @@ class AlongDimensionTransformation:
     def __init__(self, dimension_index):
         self.dimension_index = dimension_index
 
-    
+
 class Rotation2DTransformation(AlongPlaneTransformation):
     def __init__(self, spatial_dims=(-2, -1)):
         AlongPlaneTransformation.__init__(self, spatial_dims)
@@ -25,6 +26,7 @@ class Rotation2DTransformation(AlongPlaneTransformation):
         else:
             raise OutOfTypesException(item, (np.ndarray, torch.Tensor))
 
+@TRANSFORMATION_REGISTRY.register()
 class TransRot90(Rotation2DTransformation, GeneralRevrsibleTransformation):
     
     def __init__(self, spatial_dims=(-2, -1)):
@@ -33,7 +35,8 @@ class TransRot90(Rotation2DTransformation, GeneralRevrsibleTransformation):
             fwdfn=partial(Rotation2DTransformation.rot90_fn, times=1),
             rwdfn=partial(Rotation2DTransformation.rot90_fn, times=3),
         )
-    
+
+@TRANSFORMATION_REGISTRY.register()
 class TransRot180(Rotation2DTransformation, GeneralRevrsibleTransformation):
     
     def __init__(self, spatial_dims=(-2, -1)):
@@ -42,7 +45,8 @@ class TransRot180(Rotation2DTransformation, GeneralRevrsibleTransformation):
             fwdfn=partial(Rotation2DTransformation.rot90_fn, times=2),
             rwdfn=partial(Rotation2DTransformation.rot90_fn, times=2),
         )
-    
+
+@TRANSFORMATION_REGISTRY.register()
 class TransRot270(Rotation2DTransformation, GeneralRevrsibleTransformation):
     
     def __init__(self, spatial_dims=(-2, -1)):
@@ -52,7 +56,7 @@ class TransRot270(Rotation2DTransformation, GeneralRevrsibleTransformation):
             rwdfn=partial(Rotation2DTransformation.rot90_fn, times=1),
         )
     
-
+@TRANSFORMATION_REGISTRY.register()
 class Transflip(AlongDimensionTransformation, GeneralRevrsibleTransformation):
     
     def flip_fn(item, dimension_index):
