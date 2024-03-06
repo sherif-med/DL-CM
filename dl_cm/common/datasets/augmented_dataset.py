@@ -1,10 +1,11 @@
 import copy
-from dl_cm.utils.registery import Registry
+from dl_cm.common.datasets import DATASETS_REGISTERY
 from . import CompositionDataset
 from collections.abc import Iterable
 from dl_cm.common.datasets.transformations.general_transformation import GeneralRevrsibleTransformation
 
 from .transformations import TRANSFORMATION_REGISTRY
+from .transformations.general_transformation import GeneralTransformationFactory
 
 @TRANSFORMATION_REGISTRY.register(name="id")
 class TransIdentity(GeneralRevrsibleTransformation):
@@ -17,19 +18,22 @@ class TransIdentity(GeneralRevrsibleTransformation):
             rwdfn=TransIdentity.identity,
         )
 
+@DATASETS_REGISTERY.register()
 class AugmentedDataset(CompositionDataset):
     
     def __init__(self, parent_dataset, augmentations:Iterable=("id",)):
         CompositionDataset.__init__(self, parent_dataset)
-        if isinstance(next(iter(augmentations)), str):
-            augmentations = [TRANSFORMATION_REGISTRY.get(k)() for k in augmentations]
-        self.augmentations = augmentations
+        self.augmentations = [GeneralTransformationFactory.create(k) for k in augmentations]
     
     def __len__(self):
         return len(self.parent_dataset) * len(self.augmentations)
     
+    def parent_index(self, index):
+        parent_item_idx = index // (len(self.augmentations))
+        return parent_item_idx
+    
     def __getitem__(self, idx):        
-        parent_item_idx = idx // (len(self.augmentations))
+        parent_item_idx = self.parent_index(idx)
         c_augmentation_idx = idx % (len(self.augmentations))
         c_augmentation = self.augmentations[c_augmentation_idx]
         
