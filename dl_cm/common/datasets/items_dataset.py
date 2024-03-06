@@ -1,6 +1,7 @@
 from typing import List, Any
+from . import BaseDataset
 
-class ItemsDataset:
+class ItemsDataset(BaseDataset):
     
     def __init__(self, items: List[Any]):
         self.items = items
