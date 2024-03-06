@@ -1,6 +1,7 @@
 from dl_cm.common.datasets import DATASETS_REGISTERY
 from dl_cm.common.datasets.augmented_dataset import AugmentedDataset
 from dl_cm.common.datasets.preprocessed_dataset import PreprocessedDataset, PREPROCESSING_REGISTERY
+from dl_cm.common.datasets.samplers import SAMPLER_REGISTRY
 from dl_cm.common.datasets.split_datasets import split_subdatasets_random
 from torch.utils.data import DataLoader
 import pytorch_lightning as pl
@@ -65,10 +66,16 @@ def datamodule_from_config(datainfo_config:dict)->pl.LightningDataModule:
     partial_dataloaders_map = {}
     
     for c_dataloader_info in datainfo_config.get("dataloaders"):
+        respective_dataset = datasets_map[c_dataloader_info.get("respective_dataset_name")]
         c_loader_params = dict(common_loaders_params)
         c_loader_params.update(c_dataloader_info.get("params"))
+        batch_sampler_def = c_loader_params.get("batch_sampler")
+        if batch_sampler_def:
+            batch_sampler_cls = SAMPLER_REGISTRY.get(batch_sampler_def.get("name"))
+            batch_sampler = batch_sampler_cls(respective_dataset, **batch_sampler_def.get("params", {}))
+            c_loader_params["batch_sampler"] = batch_sampler
         partial_dataloaders_map[c_dataloader_info.get("name")] = partial(DataLoader,
-            datasets_map[c_dataloader_info.get("respective_dataset_name")],
+            respective_dataset,
             **c_loader_params
             )
     
