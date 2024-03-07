@@ -2,7 +2,9 @@ from typing import List, Any, Callable, Union
 from dl_cm.common.datasets import CompositionDataset
 from dl_cm.common.datasets import BaseDataset
 import numpy as np
+from dl_cm.common.datasets import DATASETS_REGISTERY
 
+@DATASETS_REGISTERY.register()
 class ShuffledDataset(CompositionDataset):
     
     def __init__(self, parent_dataset:BaseDataset, shuffled_indices:Union[list, np.ndarray] = None):

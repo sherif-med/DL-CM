@@ -47,3 +47,4 @@ class CompositionDataset(BaseDataset):
             return self.parent_dataset.get_top_dataset()
 
 from . import combined_dataset
+from . import shuffled_dataset
