@@ -34,6 +34,7 @@ task:
   metrics:
     train_mode: include('metric_mode')
     valid_mode: include('metric_mode')
+  var_reduction: map(any(), required=False)
 
 # Define reusable components
 ---
