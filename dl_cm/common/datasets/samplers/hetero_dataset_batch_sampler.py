@@ -3,6 +3,7 @@ import torch
 import random
 from collections.abc import Iterable
 from dl_cm.common.datasets import CompositionDataset
+from dl_cm.common.datasets.combined_dataset import CombinedDataset
 from . import SAMPLER_REGISTRY
 
 @SAMPLER_REGISTRY.register()
