@@ -32,8 +32,6 @@ def get_schema_path():
     #### Schema file path setting
     # Get the directory of the current script
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    # Move up one directory from the current script's directory
-    parent_dir = os.path.dirname(current_dir)
-    # Append 'schema.yaml' to this parent directory
-    schema_path = os.path.join(parent_dir, "schema.yaml")
+    # Append 'schema.yaml' to this directory
+    schema_path = os.path.join(current_dir, "schema.yaml")
     return schema_path
