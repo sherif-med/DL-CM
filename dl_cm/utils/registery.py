@@ -31,7 +31,7 @@ class Registry:
         obj : object, optional
             Object to register, defaults to None (which will return the decorator)
         name : str, optional
-            Name of the object to register, defaults to None (which will use the name of the object)
+            Name of the object to register, defaults to function or class name (which will use the name of the object)
         """
 
         if obj is None:
