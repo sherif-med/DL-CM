@@ -26,14 +26,7 @@ task:
     name: registered_optimizer()
     params: include('params')
   lr_scheduler: include('lr_scheduler', required=False)
-  critireon:
-    name: str(required=False)
-    log_on_epoch: bool(required=False)
-    log_on_step: bool(required=False)
-    def: map(include('loss'), key=registered_critireon())
-  metrics:
-    train_mode: include('metric_mode')
-    valid_mode: include('metric_mode')
+  metrics: list(include('metric'))
   var_reduction: map(any(), required=False)
 
 # Define reusable components
