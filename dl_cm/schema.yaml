@@ -26,6 +26,9 @@ task:
     name: registered_optimizer()
     params: include('params')
   lr_scheduler: include('lr_scheduler', required=False)
+  critireon: 
+    name: registered_loss()
+    params: include('params')
   metrics: list(include('metric'))
   var_reduction: map(any(), required=False)
 
@@ -52,12 +55,6 @@ callback:
 logger:
   name: registered_logger()
   params: include('params')
-
-loss:
-  params: include('params')
-  weight: num(min=0)
-  log_on_epoch: bool(required=False)
-  log_on_step: bool(required=False)
 
 metric:
   name: registered_metric()

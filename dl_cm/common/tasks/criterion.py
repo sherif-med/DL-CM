@@ -2,14 +2,31 @@ from typing import Tuple
 from dl_cm.utils.registery import Registry
 from torchmetrics import MeanMetric
 import torch.nn as nn
+class CombinedLoss(BaseLoss):
+    def __init__(self, losses: list[str, dict, BaseLoss], weights: list[float]=None):        
+        """
+        :param losses: A list of losses to be combined. Each loss can be either a string
+            (in which case it is a key in the CRITIREON_REGISTRY), a dictionary (in which
+            case it is passed to the CritireonFactory to construct a loss), or an instance
+            of nn.modules.loss._Loss.
+        :param weights: A list of weights to be used in the combination. If None, the
+            weights will be set to equal values (i.e. the losses will be equally weighted).
+            If the length of the weights list is not equal to the length of the losses list,
+            the weights will be set to equal values.
+        :return:
+        """
 
-class CombinedLoss(nn.Module):
-    def __init__(self, losses, weights=None):
         super(CombinedLoss, self).__init__()
+        losses = CritireonFactory.create(critireon_config=losses)
         self.losses = nn.ModuleList(losses)
-        # If weights are not provided, default to equal weighting
-        if weights is None or any({w is None for w in weights}):
+        
+        if weights is None:
+            logger.info("Defaulting to equal weighting of losses")
             weights = [1.0] * len(losses)
+        if len(weights) != len(losses) or any({w is None for w in weights}):
+            logger.warning("Number of weights does not match number of losses. Defaulting to equal weighting of losses")
+            weights = [1.0] * len(losses)
+        
         self.weights = weights
         if sum(self.weights)!=1:
             self.weights =list(map(lambda x:x/sum(self.weights), self.weights))
@@ -22,7 +39,7 @@ class CombinedLoss(nn.Module):
             c_loss_value = loss_fn(prediction, target)
             losses_dict[loss_fn.__class__.__name__] = c_loss_value
             total_loss += c_loss_value * weight
-        losses_dict["total_loss"] = total_loss
+        losses_dict[self.__class__.__name__] = total_loss
         return losses_dict
 
 def load_critireon_from_config(critireon_config)->CombinedLoss:
