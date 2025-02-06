@@ -18,7 +18,6 @@ class BaseFactory:
         raise NotImplementedError
 
     @classmethod
-    @classmethod
     def create(cls, param: str | dict | Type[BaseClass] | collections.abc.Iterable[Type[BaseClass]]) -> BaseClass | list[BaseClass]:
         """
         Create an instance of the class, or a list of instances from the parameters.

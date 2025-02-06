@@ -2,10 +2,19 @@ from dl_cm.utils.registery import Registry
 import torch
 import pytorch_lightning as pl
 from .base_task import BaseTask
+from dl_cm.utils.ppattern.factory import BaseFactory
 
 TASKS_REGISTERY = Registry("Tasks")
 
+class TasksFactory(BaseFactory):
 
+    @classmethod
+    def base_class(cls)-> type:
+        return BaseTask
+    
+    @classmethod
+    def registry(cls) -> Registry:
+        return TASKS_REGISTERY
 
 def load_task_from_config(task_config:dict)->BaseTask:
     """
