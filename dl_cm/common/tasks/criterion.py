@@ -1,8 +1,26 @@
-from typing import Tuple
 from dl_cm.utils.registery import Registry
 from torchmetrics import MeanMetric
 import torch.nn as nn
 from dl_cm.utils.ppattern.factory import BaseFactory
+from dl_cm import _logger as logger
+from torchmetrics import MetricCollection
+
+
+class BaseLoss(nn.modules.loss._Loss):
+    def __init__(self):
+        super(BaseLoss, self).__init__()
+    
+    def as_metric_collection(self) -> MetricCollection:
+        return MetricCollection({self.__class__.__name__: MeanMetric()})
+
+    def forward(self, prediction, target):
+        """
+        Forward pass of the loss.
+        :return: a dictionary with the key being the name of the loss and the value being the loss
+        """
+        return {self.__class__.__name__: super().forward(prediction, target)}
+
+
 class CombinedLoss(BaseLoss):
     def __init__(self, losses: list[str, dict, BaseLoss], weights: list[float]=None):        
         """
@@ -42,6 +60,16 @@ class CombinedLoss(BaseLoss):
             total_loss += c_loss_value * weight
         losses_dict[self.__class__.__name__] = total_loss
         return losses_dict
+    
+    def as_metric_collection(self):
+        # Adding current loss to the metric collection
+        metric_collection = MetricCollection({self.__class__.__name__: MeanMetric()})
+        # Adding child losses to the metric collection
+        loss_fn : BaseLoss
+        for loss_fn in self.losses:
+            metric_collection.add_metrics(loss_fn.as_metric_collection())
+        return metric_collection
+
 CRITIREON_REGISTRY = Registry("Critireon")
 CRITIREON_REGISTRY.register(CombinedLoss)
 
