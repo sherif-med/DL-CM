@@ -3,13 +3,22 @@ from dl_cm.common.tasks.optimizer import load_optimizer_from_config, load_lr_sch
 import torch
 
 from typing import List, Dict
-from typing import TypedDict
+from dl_cm.common.tasks.criterion import lossOutputStruct
+from dataclasses import dataclass
 
-class StepOutputDict(TypedDict):
-    loss: Dict | torch.Tensor
-    prediction: Dict | torch.Tensor
+@dataclass
+class StepOutputStruct:
+    loss: lossOutputStruct | torch.Tensor
+    predictions: Dict | torch.Tensor
     target: Dict | torch.Tensor
     input: Dict | torch.Tensor
+    metadata: Dict
+    auxiliary: Dict
+
+@dataclass
+class StepInputStruct:
+    inputs: Dict | torch.Tensor
+    targets: Dict | torch.Tensor
     metadata: Dict
     auxiliary: Dict
 
@@ -31,10 +40,7 @@ class BaseTask(pl.LightningModule):
         else:
             # Return a default message or raise an error if DESCRIPTION is not defined
             return "No description provided."
-    
-    def step(self, batch, compute_loss=True) -> StepOutputDict:
-        raise NotImplementedError
-        
+            
     def configure_optimizers(self):
         optimizer = load_optimizer_from_config(self.model.parameters(), self.task_config.get("optimizer"))
         lr_scheduler = load_lr_scheduler_from_config(optimizer, self.task_config.get("lr_scheduler")) if self.task_config.get("lr_scheduler") else None
