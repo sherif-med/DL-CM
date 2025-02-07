@@ -4,21 +4,33 @@ import torch.nn as nn
 from dl_cm.utils.ppattern.factory import BaseFactory
 from dl_cm import _logger as logger
 from torchmetrics import MetricCollection
+from dl_cm.utils.ppattern.named_mixin import NamedMixin
+from dataclasses import dataclass
+from typing import Self
+import torch
 
+@dataclass
+class lossOutputStruct:
+    name: str
+    losses: dict[str, float | torch.Tensor]
 
-class BaseLoss(nn.modules.loss._Loss):
+    def value(self):
+        return self.losses[self.name]
+
+class BaseLoss(nn.modules.loss._Loss, NamedMixin):
     def __init__(self):
+        NamedMixin.__init__(self)
         super(BaseLoss, self).__init__()
     
     def as_metric_collection(self) -> MetricCollection:
-        return MetricCollection({self.__class__.__name__: MeanMetric()})
+        return MetricCollection({self.name(): MeanMetric()})
 
-    def forward(self, prediction, target):
+    def forward(self, prediction, target) -> lossOutputStruct:
         """
         Forward pass of the loss.
         :return: a dictionary with the key being the name of the loss and the value being the loss
         """
-        return {self.__class__.__name__: super().forward(prediction, target)}
+        return lossOutputStruct(name=self.name(), losses={self.name(): super().forward(prediction, target)})
 
 
 class CombinedLoss(BaseLoss):
@@ -37,7 +49,7 @@ class CombinedLoss(BaseLoss):
 
         super(CombinedLoss, self).__init__()
         losses = CritireonFactory.create(critireon_config=losses)
-        self.losses = nn.ModuleList(losses)
+        self.losses : list[BaseLoss] = nn.ModuleList(losses)
         
         if weights is None:
             logger.info("Defaulting to equal weighting of losses")
@@ -50,20 +62,20 @@ class CombinedLoss(BaseLoss):
         if sum(self.weights)!=1:
             self.weights =list(map(lambda x:x/sum(self.weights), self.weights))
 
-    def forward(self, prediction, target):
+    def forward(self, prediction, target) -> lossOutputStruct:
         losses_dict = {}
         total_loss = 0.0
         # Iterate over each loss function and corresponding weight
         for loss_fn, weight in zip(self.losses, self.weights):
             c_loss_value = loss_fn(prediction, target)
-            losses_dict[loss_fn.__class__.__name__] = c_loss_value
+            losses_dict[loss_fn.name()] = c_loss_value
             total_loss += c_loss_value * weight
-        losses_dict[self.__class__.__name__] = total_loss
-        return losses_dict
+        losses_dict[self.name()] = total_loss
+        return lossOutputStruct(name=self.name(), losses=losses_dict)
     
     def as_metric_collection(self):
         # Adding current loss to the metric collection
-        metric_collection = MetricCollection({self.__class__.__name__: MeanMetric()})
+        metric_collection = MetricCollection({self.name(): MeanMetric()})
         # Adding child losses to the metric collection
         loss_fn : BaseLoss
         for loss_fn in self.losses:
