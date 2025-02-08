@@ -6,10 +6,7 @@ LEARNERS_REGISTERY = Registry("Learners")
 
 class LearnersFactory(BaseFactory):
 
-    @classmethod
-    def base_class(cls)-> type:
+    @staticmethod
+    def base_class()-> type:
         return BaseLearner
     
-    @classmethod
-    def registry(cls) -> Registry:
-        return LEARNERS_REGISTERY
