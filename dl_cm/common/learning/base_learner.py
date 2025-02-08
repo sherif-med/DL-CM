@@ -1,6 +1,4 @@
-from dl_cm.common.tasks.base_task import StepInputStruct, StepOutputStruct
-
-class BaseLearner:
+from dl_cm.common.typing import StepInputStruct, StepOutputStruct
     def __init__(self, config) -> None:
         self.config = config
     

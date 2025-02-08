@@ -3,7 +3,7 @@ from dl_cm.utils.ppattern.data_validation import validationMixin
 from dl_cm.common.tasks.criterion import CritireonFactory
 import pydantic as pd
 from dl_cm.common.tasks.criterion import BaseLoss
-from dl_cm.common.tasks.criterion import lossOutputStruct
+from dl_cm.common.typing import lossOutputStruct
 
 class CriterionLearner(BaseLearner, validationMixin):
 
