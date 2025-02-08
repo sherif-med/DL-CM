@@ -1,11 +1,15 @@
 from dl_cm.utils.registery import Registry
 import torchmetrics
 from dl_cm.utils.ppattern.factory import BaseFactory
+from dl_cm.common import DLCM
 
 METRICS_REGISTRY = Registry("Metrics")
 
-class BaseMetric(torchmetrics.metric.Metric):
-    pass
+class BaseMetric(torchmetrics.metric.Metric, DLCM):
+
+    @staticmethod
+    def registry() -> Registry:
+        return METRICS_REGISTRY
 
 class specificMetric(BaseMetric):
     
@@ -21,14 +25,10 @@ class specificMetric(BaseMetric):
 
 class MetricsFactory(BaseFactory):
 
-    @classmethod
-    def base_class(cls)-> type:
+    @staticmethod
+    def base_class()-> type:
         return BaseMetric
     
-    @classmethod
-    def registry(cls) -> Registry:
-        return METRICS_REGISTRY
-
 # Register all torchmetrics metrics
 for name in dir(torchmetrics):
     attr = getattr(torchmetrics, name)
