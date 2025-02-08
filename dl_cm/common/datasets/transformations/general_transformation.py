@@ -1,25 +1,20 @@
 from . import TRANSFORMATION_REGISTRY
-from dl_cm.config_loaders import load_named_entity
-from dl_cm.utils.exceptions import OutOfTypesException
+from dl_cm.common import DLCM
+from dl_cm.common.typing import Registry
+from dl_cm.utils.ppattern.factory import BaseFactory
+from typing import Type
 
-class GeneralTransformation:
-    pass
+class GeneralTransformation(DLCM):
+    
+    @staticmethod
+    def registry() -> Registry:
+        return TRANSFORMATION_REGISTRY
 
-class GeneralTransformationFactory:
-    def __init__(self):
-        pass
-
-    @classmethod
-    def create(cls, c_transform):
-        if isinstance(c_transform, str):
-            transformation_class = TRANSFORMATION_REGISTRY.get(c_transform)
-            return transformation_class()
-        elif isinstance(c_transform, dict):
-            return load_named_entity(TRANSFORMATION_REGISTRY, c_transform)
-        elif isinstance(c_transform, GeneralTransformation):
-            return c_transform
-        else:
-            raise OutOfTypesException(c_transform, (str, dict, GeneralTransformation,))
+class GeneralTransformationFactory(BaseFactory):
+    
+    @staticmethod
+    def base_class()-> Type["GeneralTransformation"]:
+        return GeneralTransformation
     
 
 class GeneralIrrevirsibleTransformation(GeneralTransformation):
