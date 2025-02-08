@@ -4,21 +4,26 @@ from dl_cm.utils.exceptions import OutOfTypesException
 import collections
 from typing import Self
 from typing import TypeVar, Type
-
-BaseClass = TypeVar('BaseClass', bound=type)
+from dl_cm import _logger as logger
+from dl_cm.common import DLCM
 
 class BaseFactory:
 
     @classmethod
     def registry(cls) -> Registry:
+        raise cls.base_class().registry()
+    
+    @staticmethod
+    def base_class() -> Type["DLCM"]:
         raise NotImplementedError
     
     @classmethod
-    def base_class(cls) -> Type[BaseClass]:
+    def default_instance(cls) -> DLCM:
+        logger.critical("Default instance not implemented for factory %s", cls.__name__)
         raise NotImplementedError
 
     @classmethod
-    def create(cls, param: str | dict | Type[BaseClass] | collections.abc.Iterable[Type[BaseClass]]) -> BaseClass | list[BaseClass]:
+    def create(cls, param: str | dict | Type["DLCM"] | collections.abc.Iterable[Type["DLCM"]]) -> "DLCM" | list["DLCM"]:
         """
         Create an instance of the class, or a list of instances from the parameters.
 
@@ -41,6 +46,8 @@ class BaseFactory:
             If the param is not of the expected types.
         """
 
+        if not param:
+            return cls.default_instance()
         if isinstance(param, str):
             dataset_class = cls.registry().get(param)
             return dataset_class()
