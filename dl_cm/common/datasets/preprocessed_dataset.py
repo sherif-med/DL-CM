@@ -4,29 +4,23 @@ from typing import Union, Callable
 from dl_cm.utils.exceptions import OutOfTypesException
 from dl_cm.common.datasets import DATASETS_REGISTERY
 from dl_cm.common.datasets import CompositionDataset
+from dl_cm.common import DLCM
+from typing import Type
+from dl_cm.utils.ppattern.factory import BaseFactory
 
 PREPROCESSING_REGISTERY = Registry("Preprocessing")
 
-class PreprocessingBase:
-    pass
+class PreprocessingBase(DLCM):
+    @staticmethod
+    def registry() -> Registry:
+        return PREPROCESSING_REGISTERY
 
-class PreprocessingFactory:
-    def __init__(self):
-        pass
-
-    @classmethod
-    def create(cls, c_preprocessing):
-        if isinstance(c_preprocessing, str):
-            preprocessing_class = PREPROCESSING_REGISTERY.get(c_preprocessing)
-            return preprocessing_class()
-        elif isinstance(c_preprocessing, dict):
-            return load_named_entity(PREPROCESSING_REGISTERY, c_preprocessing)
-        elif isinstance(c_preprocessing, PreprocessingBase):
-            return c_preprocessing
-        else:
-            raise OutOfTypesException(c_preprocessing, (str, dict, PreprocessingBase,))
-
-
+class PreprocessingFactory(BaseFactory):
+    
+    @staticmethod
+    def base_class()-> Type["DLCM"]:
+        return PreprocessingBase
+    
 @PREPROCESSING_REGISTERY.register(name="id")
 class PreprocessingId(PreprocessingBase):
     def __init__(self):
