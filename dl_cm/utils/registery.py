@@ -89,3 +89,9 @@ class Registry:
 
     def __iter__(self):
         return iter(self._obj_map.items())
+
+class registeredClassMixin:
+
+    @staticmethod
+    def registry() -> Registry:
+        raise NotImplementedError
