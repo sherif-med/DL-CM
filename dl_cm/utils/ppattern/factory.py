@@ -4,8 +4,14 @@ from dl_cm.utils.exceptions import OutOfTypesException
 import collections
 from typing import Self
 from typing import TypeVar, Type
+import pydantic as pd
 from dl_cm import _logger as logger
 from dl_cm.common import DLCM
+
+class namedEntitySchema(pd.BaseModel):
+    name: str
+    params: dict = None
+
 
 class BaseFactory:
 
