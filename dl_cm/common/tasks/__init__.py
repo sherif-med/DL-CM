@@ -8,13 +8,10 @@ TASKS_REGISTERY = Registry("Tasks")
 
 class TasksFactory(BaseFactory):
 
-    @classmethod
-    def base_class(cls)-> type:
+    @staticmethod
+    def base_class()-> type:
         return BaseTask
     
-    @classmethod
-    def registry(cls) -> Registry:
-        return TASKS_REGISTERY
 
 def load_task_from_config(task_config:dict)->BaseTask:
     """
