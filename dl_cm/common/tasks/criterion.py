@@ -5,6 +5,7 @@ from dl_cm.utils.ppattern.factory import BaseFactory
 from dl_cm import _logger as logger
 from torchmetrics import MetricCollection
 from dl_cm.utils.ppattern.named_mixin import NamedMixin
+from dl_cm.common import DLCM
 from dataclasses import dataclass
 from typing import Self
 import torch
@@ -17,7 +18,14 @@ class lossOutputStruct:
     def value(self):
         return self.losses[self.name]
 
-class BaseLoss(nn.modules.loss._Loss, NamedMixin):
+CRITIREON_REGISTRY = Registry("Critireon")
+
+class BaseLoss(nn.modules.loss._Loss, NamedMixin, DLCM):
+
+    @staticmethod
+    def registry() -> Registry:
+        return CRITIREON_REGISTRY
+    
     def __init__(self):
         NamedMixin.__init__(self)
         super(BaseLoss, self).__init__()
@@ -82,18 +90,12 @@ class CombinedLoss(BaseLoss):
             metric_collection.add_metrics(loss_fn.as_metric_collection())
         return metric_collection
 
-CRITIREON_REGISTRY = Registry("Critireon")
-CRITIREON_REGISTRY.register(CombinedLoss)
-
 class CritireonFactory(BaseFactory):
     
-    @classmethod
-    def base_class(cls)-> type:
+    @staticmethod
+    def base_class()-> type:
         return BaseLoss
     
-    @classmethod
-    def registry(cls) -> Registry:
-        return CRITIREON_REGISTRY
 
 for name in dir(nn.modules.loss):
     attr = getattr(nn.modules.loss, name)
