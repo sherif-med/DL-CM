@@ -1,21 +1,22 @@
 from dl_cm.utils.registery import Registry
 from dl_cm.utils.ppattern.factory import BaseFactory
 import copy
+from dl_cm.common import DLCM
+from typing import Type
 
 DATASETS_REGISTERY = Registry("Datasets")
 
-class BaseDataset:
-    pass
+class BaseDataset(DLCM):
+
+    @staticmethod
+    def registry() -> Registry:
+        return DATASETS_REGISTERY
 
 class DatasetFactory(BaseFactory):
 
-    @classmethod
-    def base_class(cls)-> type:
+    @staticmethod
+    def base_class()-> Type["DLCM"]:
         return BaseDataset
-    
-    @classmethod
-    def registry(cls) -> Registry:
-        return DATASETS_REGISTERY
 
 
 class CompositionDataset(BaseDataset):

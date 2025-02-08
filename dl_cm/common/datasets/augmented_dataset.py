@@ -18,7 +18,7 @@ class TransIdentity(GeneralRevrsibleTransformation):
             rwdfn=TransIdentity.identity,
         )
 
-@DATASETS_REGISTERY.register()
+
 class AugmentedDataset(CompositionDataset):
     
     def __init__(self, parent_dataset, augmentations:Iterable=("id",)):

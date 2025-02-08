@@ -14,7 +14,7 @@ class FilesWithinDirectoryDataset(ItemsDataset):
         ItemsDataset.__init__(self, items_paths)
 
 
-@DATASETS_REGISTERY.register()
+
 class ImagesWithinDirectoryDataset(CompositionDataset):
     
     DEFAULT_IMAGES_EXTENSIONS = tuple([".tif", ".jpeg", ".png"])

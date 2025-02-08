@@ -5,7 +5,6 @@ from collections.abc import Iterable
 from typing import Union
 
 
-@DATASETS_REGISTERY.register()
 class CombinedDataset(BaseDataset):
     
     def __init__(self, datasets_def: Iterable[Union[BaseDataset, dict, str]]):

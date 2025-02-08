@@ -34,7 +34,7 @@ class PreprocessingId(PreprocessingBase):
     def __call__(self, item):
         return item
 
-@DATASETS_REGISTERY.register()
+
 class PreprocessedDataset(CompositionDataset):
     
     def __init__(self, parent_dataset, preprocessing_fn: Union[str, dict, PreprocessingBase] = "id"):
