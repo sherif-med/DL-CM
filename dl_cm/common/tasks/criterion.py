@@ -33,12 +33,8 @@ class BaseLoss(nn.modules.loss._Loss, NamedMixin, DLCM):
     def as_metric_collection(self) -> MetricCollection:
         return MetricCollection({self.name(): MeanMetric()})
 
-    def forward(self, prediction, target) -> lossOutputStruct:
-        """
-        Forward pass of the loss.
-        :return: a dictionary with the key being the name of the loss and the value being the loss
-        """
-        return lossOutputStruct(name=self.name(), losses={self.name(): super().forward(prediction, target)})
+    def forward(self, *args, **kwargs) -> lossOutputStruct:
+        raise NotImplementedError
 
 
 class CombinedLoss(BaseLoss):
@@ -95,12 +91,26 @@ class CritireonFactory(BaseFactory):
     @staticmethod
     def base_class()-> type:
         return BaseLoss
-    
+
+import functools
+
+def adapt_external_loss(cls):
+    @functools.wraps(cls)
+    def wrapper(*args, **kwargs):
+        output = cls(*args, **kwargs)
+        if not isinstance(output, lossOutputStruct):
+            # Assume output is a scalar loss value
+            loss_value = output
+            # Create a LossOutputStruct instance with the loss value
+            adapted_output = lossOutputStruct(name=cls.__name__, losses={cls.__name__: loss_value})
+            return adapted_output
+        return output
+    return wrapper    
 
 for name in dir(nn.modules.loss):
     attr = getattr(nn.modules.loss, name)
     if isinstance(attr, type) and issubclass(attr, nn.modules.loss._Loss):
-        CRITIREON_REGISTRY.register(attr)
+        CRITIREON_REGISTRY.register(adapt_external_loss(attr))
 
 from segmentation_models_pytorch.losses import DiceLoss
-CRITIREON_REGISTRY.register(DiceLoss)
+CRITIREON_REGISTRY.register(adapt_external_loss(DiceLoss))
