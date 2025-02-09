@@ -1,26 +1,42 @@
 from dl_cm.utils.registery import Registry
-from torch.optim import Optimizer
+from dl_cm.common import DLCM
+from dl_cm.utils.ppattern.factory import BaseFactory
 
 OPTIMIZER_REGiSTERY = Registry("Optimizer")
 LR_SCHEDULER_REGiSTERY = Registry("Lr scheduler")
 
-def load_optimizer_from_config(model_params, optimizer_config:dict)-> Optimizer:
-    """"""
-    optimizer_cls = OPTIMIZER_REGiSTERY.get(optimizer_config.get("name"))
-    optimizer_params = optimizer_config.get("params")
-    return optimizer_cls(model_params, **optimizer_params)
+class BaseOptimizer(DLCM):
 
-def load_lr_scheduler_from_config(optimizer, lr_scheduler_config:dict):
-    scheduler_cls = LR_SCHEDULER_REGiSTERY.get(lr_scheduler_config.get("name"))
-    scheduler_params = lr_scheduler_config.get("params")
-    return scheduler_cls(optimizer, **scheduler_params)
+    @staticmethod
+    def registry() -> Registry:
+        return OPTIMIZER_REGiSTERY
+    
+class OptimizerFactory(BaseFactory):
+    
+    @staticmethod
+    def base_class()-> type:
+        return BaseOptimizer
 
-from torch.optim import SGD, Adam, AdamW
+class BaseLrScheduler(DLCM):
 
-OPTIMIZER_REGiSTERY.register(SGD, "SGD")
-OPTIMIZER_REGiSTERY.register(Adam, "Adam")
-OPTIMIZER_REGiSTERY.register(AdamW, "AdamW")
+    @staticmethod
+    def registry() -> Registry:
+        return LR_SCHEDULER_REGiSTERY
+    
+class LrSchedulerFactory(BaseFactory):
+    
+    @staticmethod
+    def base_class()-> type:
+        return BaseLrScheduler
 
-from torch.optim.lr_scheduler import StepLR
+import torch.optim as optim
+for name in dir(optim):
+    attr = getattr(optim, name)
+    if isinstance(attr, type) and issubclass(attr, optim.Optimizer) and attr.__module__ == optim.__name__:
+        OPTIMIZER_REGiSTERY.register(attr)
 
-LR_SCHEDULER_REGiSTERY.register(StepLR)
+import torch.optim.lr_scheduler as lr_scheduler
+for name in dir(lr_scheduler):
+    attr = getattr(lr_scheduler, name)
+    if isinstance(attr, type) and issubclass(attr, lr_scheduler._LRScheduler):
+        LR_SCHEDULER_REGiSTERY.register(attr)
