@@ -6,20 +6,23 @@ import pydantic as pd
 from dl_cm.utils.registery import Registry
 from dl_cm.common import DLCM
 from dl_cm.common.learning import LEARNERS_REGISTERY
+import torch
 
-class BaseLearner(validationMixin, DLCM):
+class BaseLearner(torch.nn.Module, validationMixin, DLCM):
 
     @staticmethod
     def registry() -> Registry:
         return LEARNERS_REGISTERY
 
-    def config_schema(cls)-> pd.BaseModel:
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
         class ValidConfig(pd.BaseModel):
             model: namedEntitySchema = None
         return ValidConfig
 
     def __init__(self, config) -> None:
         validationMixin.__init__(self, config)
+        super().__init__()
         self.config = config
         self._model : BaseModel = ModelsFactory.create(config.get("model"))
     
