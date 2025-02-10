@@ -7,7 +7,8 @@ from torchmetrics import MetricCollection
 from dl_cm.utils.ppattern.named_mixin import NamedMixin
 from dl_cm.common import DLCM
 from dataclasses import dataclass
-from typing import Self
+from dl_cm.common.typing import namedEntitySchema
+import pydantic as pd
 import torch
 
 @dataclass
@@ -20,22 +21,44 @@ class lossOutputStruct:
 
 CRITIREON_REGISTRY = Registry("Critireon")
 
+def decorate_loss(metric_cls: type[nn.modules.loss._Loss]):
+    """Decorator to make any nn.modules.loss._Loss work with specific dictionary inputs keys"""
+    class WrappedLoss(metric_cls, BaseLoss):
+        def __init__(self, preds_key: str = None, target_key: str = None, *args, **kwargs):
+            """Wraps a loss to extract values from dictionary inputs."""
+            super().__init__(*args, **kwargs)
+            BaseLoss.__init__(self)
+            self.preds_key = preds_key
+            self.target_key = target_key
+
+        def forward(self, preds: dict, target: dict=None):
+            """Extract tensors and call the original update method."""
+            pred_tensor = preds[self.preds_key] if self.preds_key else preds
+            if target is None:
+                super().forward(pred_tensor)
+                return
+            target_tensor = target[self.target_key] if self.target_key else target
+            super().forward(pred_tensor, target_tensor)
+
+    return WrappedLoss
+
 class BaseLoss(nn.modules.loss._Loss, NamedMixin, DLCM):
 
     @staticmethod
     def registry() -> Registry:
         return CRITIREON_REGISTRY
     
+    def config_schema()-> pd.BaseModel:
+        class ValidConfig(namedEntitySchema):
+            preds_key: str = None
+            target_key: str = None
+        return ValidConfig
+    
     def __init__(self):
         NamedMixin.__init__(self)
-        super(BaseLoss, self).__init__()
     
     def as_metric_collection(self) -> MetricCollection:
         return MetricCollection({self.name(): MeanMetric()})
-
-    def forward(self, *args, **kwargs) -> lossOutputStruct:
-        raise NotImplementedError
-
 
 class CombinedLoss(BaseLoss):
     def __init__(self, losses: list[str, dict, BaseLoss], weights: list[float]=None):        
@@ -110,7 +133,7 @@ def adapt_external_loss(cls):
 for name in dir(nn.modules.loss):
     attr = getattr(nn.modules.loss, name)
     if isinstance(attr, type) and issubclass(attr, nn.modules.loss._Loss):
-        CRITIREON_REGISTRY.register(adapt_external_loss(attr))
+        CRITIREON_REGISTRY.register(obj=decorate_loss(adapt_external_loss(DiceLoss)), name=name)
 
 from segmentation_models_pytorch.losses import DiceLoss
-CRITIREON_REGISTRY.register(adapt_external_loss(DiceLoss))
+CRITIREON_REGISTRY.register(obj=decorate_loss(adapt_external_loss(DiceLoss)), name="DiceLoss")
