@@ -4,8 +4,9 @@ from dl_cm.common.tasks.criterion import CritireonFactory
 import pydantic as pd
 from dl_cm.common.tasks.criterion import BaseLoss
 from dl_cm.common.typing import lossOutputStruct
+from dl_cm.common.learning.optimizable_learner import OptimizableLearner
 
-class CriterionLearner(BaseLearner, validationMixin):
+class CriterionLearner(OptimizableLearner, validationMixin):
 
     @staticmethod
     def config_schema()-> pd.BaseModel:
@@ -15,7 +16,7 @@ class CriterionLearner(BaseLearner, validationMixin):
 
     def __init__(self, learner_config:dict):
         validationMixin.__init__(self, learner_config)
-        BaseLearner.__init__(self, learner_config)
+        super().__init__(self, learner_config)
         self.criterion : BaseLoss = CritireonFactory.create(self.config.get("critireon"))
     
     def criteron_step(self, *args, **kwargs) -> lossOutputStruct:
