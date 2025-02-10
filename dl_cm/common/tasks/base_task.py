@@ -1,5 +1,4 @@
 import pytorch_lightning as pl
-from dl_cm.common.tasks.optimizer import load_optimizer_from_config, load_lr_scheduler_from_config
 import torch
 from dl_cm.common import DLCM
 from dl_cm.common.tasks import TASKS_REGISTERY
@@ -7,6 +6,8 @@ from typing import Dict
 from dl_cm.common.typing import lossOutputStruct, Registry
 from dataclasses import dataclass
 import pydantic as pd
+from dl_cm.common.learning import LearnersFactory
+from dl_cm.common.learning.optimizable_learner import OptimizableLearner
 from dl_cm.common.typing import namedEntitySchema, Any
 from dl_cm.utils.ppattern.data_validation import validationMixin
 
@@ -46,15 +47,20 @@ class BaseTask(pl.LightningModule, DLCM, validationMixin):
     def __init__(self, task_config:dict):
         validationMixin.__init__(self, task_config)
         super().__init__()
-        self.task_config: dict = task_config
-        self.save_hyperparameters(task_config)
+        self.learner : OptimizableLearner = LearnersFactory.create(task_config.get("learner"))
         self.hparams["task_name"] = type(self).__name__
-        self.lr = task_config.get("optimizer").get("params").get("lr")
+        self.save_hyperparameters(task_config)
                 
     def configure_optimizers(self):
-        optimizer = load_optimizer_from_config(self.model.parameters(), self.task_config.get("optimizer"))
-        lr_scheduler = load_lr_scheduler_from_config(optimizer, self.task_config.get("lr_scheduler")) if self.task_config.get("lr_scheduler") else None
-        if lr_scheduler is None:
-            return optimizer
-        else:
-            return [optimizer], [lr_scheduler]
+        optimizer = self.learner.optimizer
+        lr_scheduler = self.learner.lr_scheduler
+        return [optimizer], [lr_scheduler]
+    
+    @staticmethod
+    def load_from_checkpoint(ckpt_path:str, **kwargs)->"BaseTask":
+        ckpt = torch.load(ckpt_path, map_location="cpu")
+        task_name = ckpt["hyper_parameters"]["name"]
+        task_class:pl.LightningModule = TASKS_REGISTERY.get(task_name)
+        del ckpt
+        loaded_task = task_class.load_from_checkpoint(ckpt_path, **kwargs)
+        return loaded_task

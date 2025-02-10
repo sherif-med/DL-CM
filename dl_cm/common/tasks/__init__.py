@@ -1,6 +1,4 @@
 from dl_cm.utils.registery import Registry
-import torch
-import pytorch_lightning as pl
 from .base_task import BaseTask
 from dl_cm.utils.ppattern.factory import BaseFactory
 
@@ -12,21 +10,3 @@ class TasksFactory(BaseFactory):
     def base_class()-> type:
         return BaseTask
     
-
-def load_task_from_config(task_config:dict)->BaseTask:
-    """
-    Returns a predefined task loaded using config
-    """    
-    task_cls = TASKS_REGISTERY.get(task_config.get("name"))
-    loaded_task = task_cls(task_config)
-    return loaded_task
-
-
-def load_task_from_checkpoint(ckpt_path:str, **kwargs)->BaseTask:
-    """"""
-    ckpt = torch.load(ckpt_path, map_location="cpu")
-    task_name = ckpt["hyper_parameters"]["name"]
-    task_class:pl.LightningModule = TASKS_REGISTERY.get(task_name)
-    del ckpt
-    loaded_task = task_class.load_from_checkpoint(ckpt_path, **kwargs)
-    return loaded_task
