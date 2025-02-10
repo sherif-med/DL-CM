@@ -1,27 +1,29 @@
 from dl_cm.utils.registery import Registry
 import torchmetrics
+from torchmetrics.metric import Metric
 from dl_cm.utils.ppattern.factory import BaseFactory
 from dl_cm.common import DLCM
+from dl_cm.utils.ppattern.data_validation import validationMixin
+import pydantic as pd
+from dl_cm.common.typing import namedEntitySchema
 
 METRICS_REGISTRY = Registry("Metrics")
 
-class BaseMetric(torchmetrics.metric.Metric, DLCM):
+class BaseMetric(Metric, DLCM, validationMixin):
 
     @staticmethod
     def registry() -> Registry:
         return METRICS_REGISTRY
-
-class specificMetric(BaseMetric):
     
-    def __init__(self, *args, **kwargs):
-        self.predicted_map_key = kwargs.pop("predicted_map_key", None)
-        self.target_map_key = kwargs.pop("target_map_key", None)
-        super().__init__(*args, **kwargs)
-
-    def update(self, preds, target):
-        preds = preds.get(self.predicted_map_key) if self.predicted_map_key else preds
-        target = preds.get(self.target_map_key) if self.target_map_key else target
-        super().update(preds, target)
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
+        class ValidConfig(namedEntitySchema):
+            preds_key: str = None
+            target_key: str = None
+        return ValidConfig
+    
+    def __init__(self, config:dict):
+        validationMixin.__init__(self, config)
 
 class MetricsFactory(BaseFactory):
 
