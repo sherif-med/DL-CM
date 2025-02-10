@@ -8,7 +8,8 @@ from dl_cm.common.tasks.base_task import StepOutputDict
 
 class metricTrackCallback(pl.Callback, validationMixin):
 
-    def config_schema(cls)-> pd.BaseModel:
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
         class ValidConfig(pd.BaseModel):
             metrics: List[dict]
             target_key: str

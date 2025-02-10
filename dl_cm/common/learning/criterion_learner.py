@@ -7,7 +7,8 @@ from dl_cm.common.typing import lossOutputStruct
 
 class CriterionLearner(BaseLearner, validationMixin):
 
-    def config_schema(cls)-> pd.BaseModel:
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
         class ValidConfig(pd.BaseModel):
             critireon: dict
         return ValidConfig

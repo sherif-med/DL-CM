@@ -22,8 +22,8 @@ class LoggingOptions(pd.BaseModel):
 
 class MetricsLoggingCallback(pl.Callback, validationMixin):
 
-
-    def config_schema(cls)-> pd.BaseModel:
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
         class ValidConfig(LoggingOptions):
             defaults: defaulLoggingOptions
             train: list[namedLogModOptions] = None

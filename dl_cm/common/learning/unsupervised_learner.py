@@ -5,7 +5,8 @@ from dl_cm.common.typing import lossOutputStruct, StepInputStruct, StepOutputStr
 
 class UnsupervisedLearner(CriterionLearner, validationMixin):
 
-    def config_schema(cls)-> pd.BaseModel:
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
         class ValidConfig(pd.BaseModel):
             predicted_key: str
         return ValidConfig

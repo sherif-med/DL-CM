@@ -15,5 +15,5 @@ class validationMixin:
             exit(1)
     
     @staticmethod
-    def config_schema(cls)-> BaseModel:
+    def config_schema()-> BaseModel:
         raise NotImplementedError

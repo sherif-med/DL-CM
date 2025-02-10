@@ -6,7 +6,8 @@ from dl_cm.common.typing import lossOutputStruct
 
 class SupervisedLearner(CriterionLearner, validationMixin):
 
-    def config_schema(cls)-> pd.BaseModel:
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
         class ValidConfig(pd.BaseModel):
             target_key: str
             predicted_key: str
