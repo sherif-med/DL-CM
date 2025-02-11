@@ -1,8 +1,10 @@
-from dl_cm.common.tasks.base_task import StepOutputDict
+from dl_cm.common.typing import StepOutputStruct
 from dl_cm.common.trainers.callbacks.metric_track_callback import metricTrackCallback
+from dl_cm.common.tasks.base_task import BaseTask
 from dl_cm.utils.ppattern.data_validation import validationMixin
 import pydantic as pd
 import pytorch_lightning as pl
+from dl_cm.common.learning.criterion_learner import CriterionLearner
 from dl_cm import _logger as logger
 
 class logModOptions(pd.BaseModel):
@@ -30,14 +32,12 @@ class MetricsLoggingCallback(pl.Callback, validationMixin):
             valid: list[namedLogModOptions] = None
         return ValidConfig
 
+    metric_track_callback : metricTrackCallback
+
     def __init__(self, callback_config:dict):
         validationMixin.__init__(self, callback_config)
         pl.Callback.__init__(self)
         self.init_logging_flags(callback_config)
-        self.metrics_dict = {
-            "train": {},
-            "valid": {}
-        }
     
     def init_logging_flags(self, logging_config:dict):
         self.default_logging_flags = defaulLoggingOptions(**logging_config.get("defaults"))
@@ -51,33 +51,46 @@ class MetricsLoggingCallback(pl.Callback, validationMixin):
             }
         }
     
-    
+    def log(self, pl_module: pl.LightningModule, metric_name: str, metric_value: float, mode: str):
+        pl_module.log(metric_name, metric_value, 
+                      on_step=self.logging_flags.get(mode).get(metric_name).get("log_on_step"),
+                        on_epoch=self.logging_flags.get(mode).get(metric_name).get("log_on_epoch")
+                        )
+
     def on_fit_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule):
         all_callbacks = trainer.callbacks
-        callback_found = False
         for callback in all_callbacks:
             if isinstance(callback, metricTrackCallback):
-                callback_found = True
-                self.metrics_dict["train"] = callback.train_metrics
-                self.metrics_dict["valid"] = callback.valid_metrics
+                if not self.metric_track_callback:
+                    self.metric_track_callback = callback
+                else:
+                    logger.warning("Multiple metricTrackCallbacks found in trainer callbacks")
 
-        if not callback_found:
-            logger.warning("No metricTrackCallback found in trainer callbacks")
+        if not self.metric_track_callback:
+            logger.critical("No metricTrackCallback found in trainer callbacks")
 
     def on_train_batch_end(
-        self, trainer: pl.Trainer, pl_module, outputs: StepOutputDict, batch, batch_idx: int
+        self, trainer: pl.Trainer, pl_module: BaseTask, outputs: StepOutputStruct, batch, batch_idx: int
     ) -> None:
-        for (metric_name, metric) in self.metrics_dict["train"].items():
-            self.log(f"train_{metric_name}", metric, 
-                    on_step=self.logging_flags.get("train").get(metric_name).get("log_on_step"),
-                    on_epoch=self.logging_flags.get("train").get(metric_name).get("log_on_epoch"))
-        return
+        if not self.metric_track_callback:
+            logger.warning("No metricTrackCallback found in trainer callbacks! Not logging metrics")
+            return
+        # General metrics logging
+        for (metric_name, metric) in self.metric_track_callback.binary_train_metrics.items():
+            self.log(pl_module, f"train_{metric_name}", metric, "train")
+        # Loss metrics logging
+        for (metric_name, metric) in self.metric_track_callback.loss_train_metrics.items():
+            self.log(pl_module, f"train_{metric_name}", metric, "train")
 
     def on_validation_batch_end(
-            self, trainer: pl.Trainer, pl_module, outputs: StepOutputDict, batch, batch_idx: int
+            self, trainer: pl.Trainer, pl_module : pl.LightningModule, outputs: StepOutputStruct, batch, batch_idx: int
     ) -> None:
-        for (metric_name, metric) in self.metrics_dict["valid"].items():
-            self.log(f"valid_{metric_name}", metric, 
-                         on_step=self.logging_flags.get("valid").get(metric_name).get("log_on_step"),
-                         on_epoch=self.logging_flags.get("valid").get(metric_name).get("log_on_epoch"))
-        return
+        if not self.metric_track_callback:
+            logger.warning("No metricTrackCallback found in trainer callbacks! Not logging metrics")
+            return
+        # General metrics logging
+        for (metric_name, metric) in self.metric_track_callback.binary_valid_metrics.items():
+            self.log(pl_module, f"valid_{metric_name}", metric, "valid")
+        # Loss metrics logging
+        for (metric_name, metric) in self.metric_track_callback.loss_valid_metrics.items():
+            self.log(pl_module, f"valid_{metric_name}", metric, "valid")
