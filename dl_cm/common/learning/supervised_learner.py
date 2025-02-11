@@ -19,7 +19,7 @@ class SupervisedLearner(CriterionLearner, validationMixin):
         self.target_key : str = learner_config.pop("target_key")
         self.predicted_key : str = learner_config.pop("predicted_key")
     
-    def step(self, batch: StepInputStruct, compute_loss=True) -> StepOutputStruct:
+    def forward(self, batch: StepInputStruct, compute_loss=True) -> StepOutputStruct:
         predictions = self.model()(batch["inputs"])
         if compute_loss:
             targets = batch["targets"]

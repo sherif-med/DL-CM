@@ -30,5 +30,5 @@ class BaseLearner(torch.nn.Module, validationMixin, DLCM):
     def model(self):
         return self._model
 
-    def step(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
-        raise NotImplementedError
+    def forward(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
+        return self.model(batch["inputs"], *args, **kwargs)

@@ -20,10 +20,10 @@ class MultiLearner(BaseLearner, validationMixin):
     def aggregate_output(self, outputs: list[StepOutputStruct]) -> StepOutputStruct:
         raise NotImplementedError
     
-    def step(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
+    def forward(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
         leraners_output : list[StepOutputStruct] = []
         for learner in self.learners:
-            leraners_output.append(learner.step(batch, *args, **kwargs))
+            leraners_output.append(learner.forward(batch, *args, **kwargs))
         return self.aggregate_output(leraners_output)
 
 class SequentialLearner(BaseLearner, validationMixin):
@@ -39,9 +39,9 @@ class SequentialLearner(BaseLearner, validationMixin):
         BaseLearner.__init__(config)
         self.learners : list[BaseLearner] = LearnersFactory.create(config.get("learners"))
     
-    def step(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
+    def forward(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
         for learner in self.learners:
-            batch = learner.step(batch, *args, **kwargs)
+            batch = learner.forward(batch, *args, **kwargs)
         return batch
 
 class learnerWrapper(BaseLearner, validationMixin):
@@ -63,8 +63,8 @@ class learnerWrapper(BaseLearner, validationMixin):
     def post_step(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
         raise NotImplementedError
 
-    def step(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
+    def forward(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
         batch = self.pre_step(batch, *args, **kwargs)
-        batch = self.wraped_learner.step(batch, *args, **kwargs)
+        batch = self.wraped_learner.forward(batch, *args, **kwargs)
         batch = self.post_step(batch, *args, **kwargs)
         return batch

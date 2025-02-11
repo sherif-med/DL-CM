@@ -16,7 +16,7 @@ class UnsupervisedLearner(CriterionLearner, validationMixin):
         CriterionLearner.__init__(self, learner_config)
         self.predicted_key : str = learner_config.pop("predicted_key")
     
-    def step(self, batch: StepInputStruct, compute_loss=True) -> StepOutputStruct:
+    def forward(self, batch: StepInputStruct, compute_loss=True) -> StepOutputStruct:
         predictions = self.model()(batch["inputs"])
         if compute_loss:
             loss_dict = self.criteron_step(predictions)
