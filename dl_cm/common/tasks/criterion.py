@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from dl_cm.common.typing import namedEntitySchema
 import pydantic as pd
 import torch
+from dl_cm.utils.exceptions import OutOfTypesException
+from dl_cm.utils.ppattern.data_validation import validationMixin
 
 @dataclass
 class lossOutputStruct:
@@ -21,28 +23,43 @@ class lossOutputStruct:
 
 CRITIREON_REGISTRY = Registry("Critireon")
 
-def decorate_loss(metric_cls: type[nn.modules.loss._Loss]):
-    """Decorator to make any nn.modules.loss._Loss work with specific dictionary inputs keys"""
-    class WrappedLoss(metric_cls, BaseLoss):
-        def __init__(self, preds_key: str = None, target_key: str = None, *args, **kwargs):
+def base_loss_adapter(loss_cls: type[nn.modules.loss._Loss]):
+    """Decorator to make any external loss inherit from BaseLoss
+       and adapt output to lossOutputStruct
+    """
+    class WrappedLoss(loss_cls, BaseLoss):
+        def __init__(self, config:dict):
             """Wraps a loss to extract values from dictionary inputs."""
-            super().__init__(*args, **kwargs)
-            BaseLoss.__init__(self)
-            self.preds_key = preds_key
-            self.target_key = target_key
+            BaseLoss.__init__(self, config)
+            super().__init__(config.get("params", {}))
+        
+        @staticmethod
+        def adapt_output_struct(output_loss):
+            if isinstance(output_loss, lossOutputStruct):
+                return output_loss
+            if isinstance(output_loss, (torch.Tensor, float)):
+                output_loss = lossOutputStruct(name=loss_cls.__name__, losses={loss_cls.__name__: output_loss})
+                return output_loss
+            if isinstance(output_loss, dict):
+                if not loss_cls.__name__ in output_loss:
+                    logger.critical(f"Metric {loss_cls.__name__} is not in loss dict!")
+                output_loss = lossOutputStruct(name=loss_cls.__name__, losses=output_loss)
+                return output_loss
+            raise OutOfTypesException(output_loss, (lossOutputStruct, torch.Tensor, float, dict))
 
         def forward(self, preds: dict, target: dict=None):
             """Extract tensors and call the original update method."""
             pred_tensor = preds[self.preds_key] if self.preds_key else preds
             if target is None:
-                super().forward(pred_tensor)
-                return
+                loss_output = super().forward(pred_tensor)
+                return self.adapt_output_struct(loss_output)
             target_tensor = target[self.target_key] if self.target_key else target
-            super().forward(pred_tensor, target_tensor)
+            loss_output = super().forward(pred_tensor, target_tensor)
+            return self.adapt_output_struct(loss_output)
 
     return WrappedLoss
 
-class BaseLoss(nn.modules.loss._Loss, NamedMixin, DLCM):
+class BaseLoss(NamedMixin, DLCM, validationMixin):
 
     @staticmethod
     def registry() -> Registry:
@@ -54,8 +71,11 @@ class BaseLoss(nn.modules.loss._Loss, NamedMixin, DLCM):
             target_key: str = None
         return ValidConfig
     
-    def __init__(self):
+    def __init__(self, config:dict):
         NamedMixin.__init__(self)
+        validationMixin.__init__(self, config)
+        self.preds_key = config.get("preds_key")
+        self.target_key = config.get("target_key")
     
     def as_metric_collection(self) -> MetricCollection:
         return MetricCollection({self.name(): MeanMetric()})
@@ -115,25 +135,10 @@ class CritireonFactory(BaseFactory):
     def base_class()-> type:
         return BaseLoss
 
-import functools
-
-def adapt_external_loss(cls):
-    @functools.wraps(cls)
-    def wrapper(*args, **kwargs):
-        output = cls(*args, **kwargs)
-        if not isinstance(output, lossOutputStruct):
-            # Assume output is a scalar loss value
-            loss_value = output
-            # Create a LossOutputStruct instance with the loss value
-            adapted_output = lossOutputStruct(name=cls.__name__, losses={cls.__name__: loss_value})
-            return adapted_output
-        return output
-    return wrapper    
-
 for name in dir(nn.modules.loss):
     attr = getattr(nn.modules.loss, name)
     if isinstance(attr, type) and issubclass(attr, nn.modules.loss._Loss):
-        CRITIREON_REGISTRY.register(obj=decorate_loss(adapt_external_loss(DiceLoss)), name=name)
+        CRITIREON_REGISTRY.register(obj=attr, name=name, base_class_adapter=base_loss_adapter)
 
 from segmentation_models_pytorch.losses import DiceLoss
-CRITIREON_REGISTRY.register(obj=decorate_loss(adapt_external_loss(DiceLoss)), name="DiceLoss")
+CRITIREON_REGISTRY.register(obj=DiceLoss, name="DiceLoss", base_class_adapter=base_loss_adapter)
