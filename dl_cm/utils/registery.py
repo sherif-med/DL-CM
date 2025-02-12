@@ -22,7 +22,7 @@ class Registry:
 
         self._obj_map[name] = obj
 
-    def register(self, obj=None, name=None):
+    def register(self, obj=None, name: str=None, base_class_adapter : callable[[type], type]=lambda x: x):
         """
         Method to register an object in the registry
 
@@ -32,6 +32,8 @@ class Registry:
             Object to register, defaults to None (which will return the decorator)
         name : str, optional
             Name of the object to register, defaults to function or class name (which will use the name of the object)
+        base_class_adapter : callable, optional
+            Callable to make any external class inherit from BaseClass
         """
 
         if obj is None:
@@ -39,7 +41,7 @@ class Registry:
             def deco(func_or_class, name=name):
                 if name is None:
                     name = func_or_class.__name__
-                self._do_register(name, func_or_class)
+                self._do_register(name, base_class_adapter(func_or_class))
                 return func_or_class
 
             return deco
@@ -47,7 +49,7 @@ class Registry:
         if name is None:
             name = obj.__name__
 
-        self._do_register(name, obj)
+        self._do_register(name, base_class_adapter(obj))
 
     def get(self, name):
         """

@@ -9,8 +9,9 @@ from dl_cm.common.tasks.criterion import BaseLoss
 from dl_cm.common.tasks.metrics import BaseMetric
 from dl_cm.common.tasks.base_task import BaseTask
 from dl_cm.common.learning.criterion_learner import CriterionLearner
+from dl_cm.common.trainers.callbacks import baseCallback
 
-class metricTrackCallback(pl.Callback, validationMixin):
+class metricTrackCallback(baseCallback, validationMixin):
 
     @staticmethod
     def config_schema()-> pd.BaseModel:
