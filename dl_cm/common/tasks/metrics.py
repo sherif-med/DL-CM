@@ -9,15 +9,13 @@ from dl_cm.common.typing import namedEntitySchema
 
 METRICS_REGISTRY = Registry("Metrics")
 
-def decorate_metric(metric_cls: type[Metric]):
+def base_metric_adapter(metric_cls: type[Metric]):
     """Decorator to make any torchmetrics.Metric work with specific dictionary inputs keys"""
     class WrappedMetric(metric_cls, BaseMetric):
-        def __init__(self, preds_key: str = None, target_key: str = None, *args, **kwargs):
+        def __init__(self, config:dict):
             """Wraps a metric to extract values from dictionary inputs."""
-            super().__init__(*args, **kwargs)
-            BaseMetric.__init__(self)
-            self.preds_key = preds_key
-            self.target_key = target_key
+            BaseMetric.__init__(self, config)
+            super().__init__(config.get("params", {}))
 
         def update(self, preds: dict, target: dict=None):
             """Extract tensors and call the original update method."""
@@ -30,7 +28,7 @@ def decorate_metric(metric_cls: type[Metric]):
 
     return WrappedMetric
 
-class BaseMetric(Metric, DLCM, validationMixin):
+class BaseMetric(DLCM, validationMixin):
 
     @staticmethod
     def registry() -> Registry:
@@ -45,6 +43,8 @@ class BaseMetric(Metric, DLCM, validationMixin):
     
     def __init__(self, config:dict):
         validationMixin.__init__(self, config)
+        self.preds_key = config.get("preds_key")
+        self.target_key = config.get("target_key")
 
 class MetricsFactory(BaseFactory):
 
@@ -56,6 +56,6 @@ class MetricsFactory(BaseFactory):
 for name in dir(torchmetrics):
     attr = getattr(torchmetrics, name)
     if isinstance(attr, type) and issubclass(attr, Metric):
-        METRICS_REGISTRY.register(obj=decorate_metric(attr), name=attr.__name__)
+        METRICS_REGISTRY.register(obj=attr, name=attr.__name__, base_class_adapter=base_metric_adapter)
 
 
