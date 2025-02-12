@@ -19,7 +19,6 @@ class BaseLogger(DLCM, validationMixin):
     
     def __init__(self, config: dict) -> None:
         validationMixin.__init__(self, config)
-        super().__init__(**config)
     
 class LoggersFactory(BaseFactory):
     
@@ -27,8 +26,11 @@ class LoggersFactory(BaseFactory):
     def base_class()-> type:
         return BaseLogger
 
+from functools import partial
+base_logger_adapter = partial(DLCM.base_class_adapter, base_cls=BaseLogger)
+
 import pytorch_lightning.loggers as pl_loggers
 for name in dir(pl_loggers):
     attr = getattr(pl_loggers, name)
     if isinstance(attr, type) and issubclass(attr, pl_loggers.Logger) and attr.__module__ == pl_loggers.__name__:
-        LOGGERS_REGISTERY.register(attr)
+        LOGGERS_REGISTERY.register(attr, base_class_adapter=base_logger_adapter)
