@@ -35,6 +35,31 @@ class SubDataset(CompositionDataset, validationMixin):
         real_idx = self.indices[idx]
         return self.parent_dataset.__getitem__(real_idx)
 
+class SplitDataset(CompositionDataset, validationMixin):
+
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
+        class ValidConfig(pd.BaseModel):
+            reference_names: list[str]
+            split_ratios: list[float]
+        return ValidConfig
+    
+    def __init__(self, config: dict):
+        validationMixin.__init__(self, config)
+        self.reference_names = config.get("reference_names")
+        self.split_ratios = config.get("split_ratios")
+        
+        if (len(self.reference_names)!= len(self.split_ratios)):
+            raise ValueError("Parameters 'reference_names' and 'split_ratios'\
+                should have the same length!")
+        super().__init__(config)
+        self._ref_datasets_map = {
+            k:v for k,v in zip(self.reference_names, split_dataset_random(self.parent_dataset, self.split_ratios))
+            }
+    
+    def get_dataset_by_ref_name(self, ref_name: str)-> BaseDataset:
+        return self._ref_datasets_map.get(ref_name)
+
 
 def split_dataset_random(
         parent_dataset: ItemsDataset,
