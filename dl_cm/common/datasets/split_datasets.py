@@ -35,7 +35,12 @@ class SubDataset(CompositionDataset, validationMixin):
         real_idx = self.indices[idx]
         return self.parent_dataset.__getitem__(real_idx)
 
-def split_subdatasets_random(parent_dataset: ItemsDataset, fractions: collections.abc.Iterable[float]) -> list[SubDataset]:
+
+def split_dataset_random(
+        parent_dataset: ItemsDataset,
+        fractions: collections.abc.Iterable[float],
+        reference_names: collections.abc.Iterable[str]
+        ) -> list[SubDataset]:
     """
     Split a parent dataset into non-overlapping subdatasets with random indices,
     based on specified fractions.
@@ -60,11 +65,15 @@ def split_subdatasets_random(parent_dataset: ItemsDataset, fractions: collection
     ends = starts[1:]
 
     subdatasets = []
-    for start, end in zip(starts, ends):
+    for start, end, ref_name in zip(starts, ends, reference_names):
         # Extract the indices for this subdataset
         sub_indices = indices[start:end]
-        
+        c_config = {
+            "parent_dataset": parent_dataset,
+            "indices": sub_indices,
+            "reference_name": ref_name
+        }
         # Create a new subdataset instance for the current subset of indices
-        subdatasets.append(SubDataset(parent_dataset, sub_indices))
+        subdatasets.append(SubDataset(c_config))
     
     return subdatasets
