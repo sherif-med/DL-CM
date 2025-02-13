@@ -4,7 +4,7 @@ from dl_cm.common.tasks.base_task import BaseTask
 from dl_cm.utils.ppattern.data_validation import validationMixin
 import pydantic as pd
 import pytorch_lightning as pl
-from dl_cm.common.learning.criterion_learner import CriterionLearner
+from dl_cm.common.trainers.callbacks import BaseCallback
 from dl_cm import _logger as logger
 
 class logModOptions(pd.BaseModel):
@@ -22,7 +22,7 @@ class LoggingOptions(pd.BaseModel):
     train: list[namedLogModOptions]
     valid: list[namedLogModOptions]
 
-class MetricsLoggingCallback(pl.Callback, validationMixin):
+class MetricsLoggingCallback(BaseCallback, validationMixin):
 
     @staticmethod
     def config_schema()-> pd.BaseModel:
@@ -36,7 +36,7 @@ class MetricsLoggingCallback(pl.Callback, validationMixin):
 
     def __init__(self, callback_config:dict):
         validationMixin.__init__(self, callback_config)
-        pl.Callback.__init__(self)
+        super().__init__(self)
         self.init_logging_flags(callback_config)
     
     def init_logging_flags(self, logging_config:dict):

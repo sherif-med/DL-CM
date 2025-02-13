@@ -9,7 +9,7 @@ class OptimizableLearner(BaseLearner, validationMixin):
 
     @staticmethod
     def config_schema()-> pd.BaseModel:
-        class ValidConfig(pd.BaseModel):
+        class ValidConfig(namedEntitySchema):
             optimizer: namedEntitySchema | list[namedEntitySchema] = None
             lr_scheduler: namedEntitySchema | list[namedEntitySchema] = None
         return ValidConfig

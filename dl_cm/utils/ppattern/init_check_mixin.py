@@ -13,5 +13,9 @@ class InitCheckMixin:
         return self.__class__._initialized
     
     def check_base_class_initialized(self):
+        """
+        Raise an exception if the base class has not been initialized.
+        This method should be called in methods that require the base class to be initialized.
+        """
         if not self.base_class_initialized:
             raise BaseClassNotInitializedException(self)

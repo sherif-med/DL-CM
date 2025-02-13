@@ -4,10 +4,11 @@ from dl_cm.utils.ppattern.factory import BaseFactory
 from dl_cm.common.typing import namedEntitySchema
 import pydantic as pd
 from dl_cm.utils.ppattern.data_validation import validationMixin
+import pytorch_lightning as pl
 
 CALLBACKS_REGISTERY = Registry("Callbacks")
 
-class baseCallback(DLCM, validationMixin):
+class baseCallback(pl.Callback, DLCM, validationMixin):
 
     @staticmethod
     def config_schema() -> pd.BaseModel:
@@ -19,6 +20,7 @@ class baseCallback(DLCM, validationMixin):
     
     def __init__(self, config: dict) -> None:
         validationMixin.__init__(self, config)
+        super().__init__()
 
 class CallbacksFactory(BaseFactory[baseCallback]):
     

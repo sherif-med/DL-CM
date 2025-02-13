@@ -17,7 +17,6 @@ class FilteredItemsDataset(CompositionDataset, validationMixin):
         validationMixin.__init__(self, config)
         super().__init__(config)
         if not isinstance(self.parent_dataset, ItemsDataset):
-            # raise error with details showing current instance type and expected type
             raise TypeError(f"Expected ItemsDataset, got {type(self.parent_dataset)}")
         filter_fn = FunctionsFactory.create(config.get("filter_fn"))
         self.filtered_items_indices = []

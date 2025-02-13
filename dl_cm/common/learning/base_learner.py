@@ -16,14 +16,13 @@ class BaseLearner(torch.nn.Module, validationMixin, DLCM):
 
     @staticmethod
     def config_schema()-> pd.BaseModel:
-        class ValidConfig(pd.BaseModel):
+        class ValidConfig(namedEntitySchema):
             model: namedEntitySchema = None
         return ValidConfig
 
-    def __init__(self, config) -> None:
+    def __init__(self, config: dict) -> None:
         validationMixin.__init__(self, config)
         super().__init__()
-        self.config = config
         self._model : BaseModel = ModelsFactory.create(config.get("model"))
     
     @property

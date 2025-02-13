@@ -1,14 +1,10 @@
 
-
-from pathlib import Path
 from pytorch_lightning import LightningModule, Trainer
 from skimage.io import imsave
 from dl_cm.common.trainers.callbacks.prediction_writer import PostPredictionCallback
-import numpy as np
 from collections.abc import Iterable, Callable
 from typing import Dict
 from dl_cm.common.datasets.transformations.general_transformation import GeneralRevrsibleTransformation
-import torch
 from dl_cm.utils.ppattern.batch_operations import merge_multiple_batches, split_into_batches, get_batch_size_from_items_dict
 
 class TestAUgmentedPredictionWriter(PostPredictionCallback):
