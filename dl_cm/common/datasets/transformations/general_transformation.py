@@ -2,6 +2,7 @@ from . import TRANSFORMATION_REGISTRY
 from dl_cm.common import DLCM
 from dl_cm.common.typing import Registry
 from dl_cm.utils.ppattern.factory import BaseFactory
+from abc import ABC, abstractmethod
 
 class GeneralTransformation(DLCM):
     
@@ -16,13 +17,14 @@ class GeneralTransformationFactory(BaseFactory[GeneralTransformation]):
         return GeneralTransformation
     
 
-class GeneralIrrevirsibleTransformation(GeneralTransformation):
+class GeneralIrrevirsibleTransformation(GeneralTransformation, ABC):
     
     def __call__(self, item, **kwargs):        
         return self.__fwd__(item, **kwargs)
     
+    @abstractmethod
     def __fwd__(self, *args):
-        raise NotImplementedError
+        pass
 
 class GeneralRevrsibleTransformation(GeneralTransformation):
     

@@ -92,8 +92,10 @@ class Registry:
     def __iter__(self):
         return iter(self._obj_map.items())
 
-class registeredClassMixin:
+from abc import ABC, abstractmethod
+class registeredClassMixin(ABC):
 
     @staticmethod
+    @abstractmethod
     def registry() -> Registry:
-        raise NotImplementedError
+        pass

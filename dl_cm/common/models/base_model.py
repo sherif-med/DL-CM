@@ -3,8 +3,9 @@ from dl_cm.common import DLCM
 from dl_cm.utils.registery import Registry
 from dl_cm.common.models import MODELS_REGISTERY
 import pydantic as pd
+from abc import ABC, abstractmethod
 
-class BaseModel(torch.nn.Module, DLCM):
+class BaseModel(torch.nn.Module, DLCM, ABC):
 
     @staticmethod
     def registry() -> Registry:
@@ -16,13 +17,15 @@ class BaseModel(torch.nn.Module, DLCM):
         #self.save_hyperparameters(model_config)
         #self.hparams["model_name"] = type(self).__name__
     
+    @abstractmethod
     def forward(self, x):
-        raise NotImplementedError
+        pass
     
     @classmethod
+    @abstractmethod
     def get_prediction_schema(cls) -> pd.BaseModel:
         """Returns the expected prediction schema of the model"""
-        raise NotImplementedError
+        pass
     
 
 class IdModel(BaseModel):

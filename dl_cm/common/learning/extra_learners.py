@@ -3,8 +3,9 @@ from dl_cm.utils.ppattern.data_validation import validationMixin
 import pydantic as pd
 from dl_cm.common.learning import LearnersFactory
 from dl_cm.common.typing import StepOutputStruct, StepInputStruct
+from abc import ABC, abstractmethod
 
-class MultiLearner(BaseLearner, validationMixin):
+class MultiLearner(BaseLearner, validationMixin, ABC):
 
     @staticmethod
     def config_schema()-> pd.BaseModel:
@@ -17,8 +18,9 @@ class MultiLearner(BaseLearner, validationMixin):
         BaseLearner.__init__(config)
         self.learners : list[BaseLearner] = LearnersFactory.create(config.get("learners"))
     
+    @abstractmethod
     def aggregate_output(self, outputs: list[StepOutputStruct]) -> StepOutputStruct:
-        raise NotImplementedError
+        pass
     
     def forward(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
         leraners_output : list[StepOutputStruct] = []
@@ -44,7 +46,7 @@ class SequentialLearner(BaseLearner, validationMixin):
             batch = learner.forward(batch, *args, **kwargs)
         return batch
 
-class learnerWrapper(BaseLearner, validationMixin):
+class learnerWrapper(BaseLearner, validationMixin, ABC):
 
     @staticmethod
     def config_schema()-> pd.BaseModel:
@@ -57,11 +59,13 @@ class learnerWrapper(BaseLearner, validationMixin):
         BaseLearner.__init__(config)
         self.wraped_learner : BaseLearner = LearnersFactory.create(config.get("wraped_learner"))
     
+    @abstractmethod
     def pre_step(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
-        raise NotImplementedError
+        pass
     
+    @abstractmethod
     def post_step(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
-        raise NotImplementedError
+        pass
 
     def forward(self, batch: StepInputStruct, *args, **kwargs) -> StepOutputStruct:
         batch = self.pre_step(batch, *args, **kwargs)
