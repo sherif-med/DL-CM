@@ -3,15 +3,24 @@ from dl_cm.utils.ppattern.factory import BaseFactory
 import copy
 from dl_cm.common import DLCM
 from typing import Type
+from dl_cm.utils.ppattern.data_validation import validationMixin
+from dl_cm.common.typing import namedEntitySchema
+import pydantic as pd
 
 DATASETS_REGISTERY = Registry("Datasets")
+class BaseDataset(DLCM, validationMixin):
 
-class BaseDataset(DLCM):
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
+        return namedEntitySchema
 
     @staticmethod
     def registry() -> Registry:
         return DATASETS_REGISTERY
 
+    def __init__(self, config: dict) -> None:
+        validationMixin.__init__(self, config)
+    
 class DatasetFactory(BaseFactory):
 
     @staticmethod
