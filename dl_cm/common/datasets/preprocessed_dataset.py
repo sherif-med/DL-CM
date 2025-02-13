@@ -7,6 +7,8 @@ from dl_cm.common.datasets import CompositionDataset
 from dl_cm.common import DLCM
 from typing import Type
 from dl_cm.utils.ppattern.factory import BaseFactory
+from dl_cm.utils.ppattern.data_validation import validationMixin
+import pydantic as pd
 
 PREPROCESSING_REGISTERY = Registry("Preprocessing")
 
@@ -29,11 +31,18 @@ class PreprocessingId(PreprocessingBase):
         return item
 
 
-class PreprocessedDataset(CompositionDataset):
+class PreprocessedDataset(CompositionDataset, validationMixin):
+
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
+        class ValidConfig(pd.BaseModel):
+            preprocessing_fn: str | Callable = "id"
+        return ValidConfig
     
-    def __init__(self, parent_dataset, preprocessing_fn: Union[str, dict, PreprocessingBase] = "id"):
-        super().__init__(parent_dataset)
-        self.preprocessing_callable = PreprocessingFactory.create(preprocessing_fn)
+    def __init__(self, config: dict):
+        validationMixin.__init__(self, config)
+        super().__init__(config)
+        self.preprocessing_callable = PreprocessingFactory.create(config.get("preprocessing_fn"))
     
     def __len__(self):
         return len(self.parent_dataset)
