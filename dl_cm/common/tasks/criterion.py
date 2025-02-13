@@ -129,10 +129,10 @@ class CombinedLoss(BaseLoss):
             metric_collection.add_metrics(loss_fn.as_metric_collection())
         return metric_collection
 
-class CritireonFactory(BaseFactory):
+class CritireonFactory(BaseFactory[BaseLoss]):
     
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[BaseLoss]:
         return BaseLoss
 
 for name in dir(nn.modules.loss):

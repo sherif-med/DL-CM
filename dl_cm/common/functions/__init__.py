@@ -4,8 +4,8 @@ from collections.abc import Callable
 
 FUNCTIONS_REGISTERY = Registry("Functions")
 
-class FunctionsFactory(BaseFactory):
+class FunctionsFactory(BaseFactory[Callable]):
     
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[Callable]:
         return Callable

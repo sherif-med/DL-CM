@@ -4,9 +4,9 @@ from dl_cm.common.learning.base_learner import BaseLearner
 
 LEARNERS_REGISTERY = Registry("Learners")
 
-class LearnersFactory(BaseFactory):
+class LearnersFactory(BaseFactory[BaseLearner]):
 
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[BaseLearner]:
         return BaseLearner
     

@@ -11,10 +11,10 @@ class BaseOptimizer(DLCM):
     def registry() -> Registry:
         return OPTIMIZER_REGiSTERY
     
-class OptimizerFactory(BaseFactory):
+class OptimizerFactory(BaseFactory[BaseOptimizer]):
     
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[BaseOptimizer]:
         return BaseOptimizer
 
 class BaseLrScheduler(DLCM):

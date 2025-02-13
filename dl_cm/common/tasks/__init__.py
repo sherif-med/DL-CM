@@ -4,9 +4,9 @@ from dl_cm.utils.ppattern.factory import BaseFactory
 
 TASKS_REGISTERY = Registry("Tasks")
 
-class TasksFactory(BaseFactory):
+class TasksFactory(BaseFactory[BaseTask]):
 
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[BaseTask]:
         return BaseTask
     

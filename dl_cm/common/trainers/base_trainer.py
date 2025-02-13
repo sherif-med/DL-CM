@@ -35,7 +35,7 @@ class BaseTrainer(pl.Trainer):
         }
         super().__init__(**params)
 
-class TrainerFactory(BaseFactory):
+class TrainerFactory(BaseFactory[BaseTrainer]):
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[BaseTrainer]:
         return BaseTrainer

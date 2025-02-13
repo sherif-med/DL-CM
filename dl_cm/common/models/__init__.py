@@ -4,10 +4,10 @@ from dl_cm.utils.ppattern.factory import BaseFactory
 
 MODELS_REGISTERY = Registry("Models")
 
-class ModelsFactory(BaseFactory):
+class ModelsFactory(BaseFactory[BaseModel]):
 
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[BaseModel]:
         return BaseModel
     
     @classmethod

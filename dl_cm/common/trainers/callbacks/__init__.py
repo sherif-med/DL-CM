@@ -20,10 +20,10 @@ class baseCallback(DLCM, validationMixin):
     def __init__(self, config: dict) -> None:
         validationMixin.__init__(self, config)
 
-class CallbacksFactory(BaseFactory):
+class CallbacksFactory(BaseFactory[baseCallback]):
     
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[baseCallback]:
         return baseCallback
 
 from pytorch_lightning.callbacks.progress import TQDMProgressBar

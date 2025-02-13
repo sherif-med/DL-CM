@@ -46,10 +46,10 @@ class BaseMetric(DLCM, validationMixin):
         self.preds_key = config.get("preds_key")
         self.target_key = config.get("target_key")
 
-class MetricsFactory(BaseFactory):
+class MetricsFactory(BaseFactory[BaseMetric]):
 
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[BaseMetric]:
         return BaseMetric
     
 # Register all torchmetrics metrics

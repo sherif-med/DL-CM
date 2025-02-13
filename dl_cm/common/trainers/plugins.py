@@ -20,7 +20,7 @@ class BasePlugin(pl.TrainerPlugin):
         validationMixin.__init__(self, config)
         super().__init__(**config)
 
-class PluginsFactory(BaseFactory):
+class PluginsFactory(BaseFactory[BasePlugin]):
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[BasePlugin]:
         return BasePlugin

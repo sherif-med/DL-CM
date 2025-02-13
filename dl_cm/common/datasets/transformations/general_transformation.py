@@ -2,7 +2,6 @@ from . import TRANSFORMATION_REGISTRY
 from dl_cm.common import DLCM
 from dl_cm.common.typing import Registry
 from dl_cm.utils.ppattern.factory import BaseFactory
-from typing import Type
 
 class GeneralTransformation(DLCM):
     
@@ -10,10 +9,10 @@ class GeneralTransformation(DLCM):
     def registry() -> Registry:
         return TRANSFORMATION_REGISTRY
 
-class GeneralTransformationFactory(BaseFactory):
+class GeneralTransformationFactory(BaseFactory[GeneralTransformation]):
     
     @staticmethod
-    def base_class()-> Type["GeneralTransformation"]:
+    def base_class()-> type[GeneralTransformation]:
         return GeneralTransformation
     
 

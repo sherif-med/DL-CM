@@ -20,10 +20,10 @@ class BaseLogger(DLCM, validationMixin):
     def __init__(self, config: dict) -> None:
         validationMixin.__init__(self, config)
     
-class LoggersFactory(BaseFactory):
+class LoggersFactory(BaseFactory[BaseLogger]):
     
     @staticmethod
-    def base_class()-> type:
+    def base_class()-> type[BaseLogger]:
         return BaseLogger
 
 from functools import partial

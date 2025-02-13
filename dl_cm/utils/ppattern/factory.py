@@ -1,35 +1,35 @@
+import collections.abc
 from dl_cm.utils.registery import Registry
 from dl_cm.config_loaders import load_named_entity
 from dl_cm.utils.exceptions import OutOfTypesException
 import collections
-from typing import Self
-from typing import TypeVar, Type
+from typing import TypeVar, Generic
 import pydantic as pd
 from dl_cm import _logger as logger
-from dl_cm.common import DLCM
+from dl_cm.utils.registery import registeredClassMixin
 
 class namedEntitySchema(pd.BaseModel):
     name: str
-    params: dict = None
+    params: dict = {}
 
-
-class BaseFactory:
+T = TypeVar("T", bound=registeredClassMixin)
+class BaseFactory(Generic[T]):
 
     @classmethod
     def registry(cls) -> Registry:
         raise cls.base_class().registry()
     
     @staticmethod
-    def base_class() -> Type["DLCM"]:
+    def base_class() -> T:
         raise NotImplementedError
     
     @classmethod
-    def default_instance(cls) -> DLCM:
+    def default_instance(cls) -> T:
         logger.critical("Default instance not implemented for factory %s", cls.__name__)
         raise NotImplementedError
 
     @classmethod
-    def create(cls, param: str | dict | Type["DLCM"] | collections.abc.Iterable[Type["DLCM"]]) -> "DLCM" | list["DLCM"]:
+    def create(cls, param: str | dict | T | collections.abc.Iterable[T]) -> T | list[T]:
         """
         Create an instance of the class, or a list of instances from the parameters.
 
