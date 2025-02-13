@@ -1,8 +1,6 @@
 
 from dl_cm.utils.registery import Registry
-from typing import Union, Callable
-from dl_cm.utils.exceptions import OutOfTypesException
-from dl_cm.common.datasets import DATASETS_REGISTERY
+from typing import Callable
 from dl_cm.common.datasets import CompositionDataset
 from dl_cm.common import DLCM
 from typing import Type
@@ -12,19 +10,19 @@ import pydantic as pd
 
 PREPROCESSING_REGISTERY = Registry("Preprocessing")
 
-class PreprocessingBase(DLCM):
+class BasePreprocessing(DLCM):
     @staticmethod
     def registry() -> Registry:
         return PREPROCESSING_REGISTERY
 
-class PreprocessingFactory(BaseFactory):
+class PreprocessingFactory(BaseFactory[BasePreprocessing]):
     
     @staticmethod
     def base_class()-> Type["DLCM"]:
-        return PreprocessingBase
+        return BasePreprocessing
     
 @PREPROCESSING_REGISTERY.register(name="id")
-class PreprocessingId(PreprocessingBase):
+class PreprocessingId(BasePreprocessing):
     def __init__(self):
         pass
     def __call__(self, item):
