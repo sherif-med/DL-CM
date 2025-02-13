@@ -5,30 +5,24 @@ from dl_cm.common.datasets import CompositionDataset
 from dl_cm.common.datasets import DATASETS_REGISTERY
 from skimage.io import imread
 import torch
+import pydantic as pd
+from dl_cm.utils.ppattern.data_validation import validationMixin
 
-class FilesWithinDirectoryDataset(ItemsDataset):
+class FilesWithinDirectoryDataset(ItemsDataset, validationMixin):
+
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
+        class ValidConfig(pd.BaseModel):
+            directory_path: str
+        return ValidConfig
     
-    def __init__(self, root_directory_path):        
-        self.root_directory_path = root_directory_path
-        items_paths = glob.glob(os.path.join(root_directory_path, "*"))
-        ItemsDataset.__init__(self, items_paths)
+    def __init__(self, config: dict):
+        validationMixin.__init__(self, config)
+        directory_path = config.get("directory_path")
+        items_paths = glob.glob(os.path.join(directory_path, "*"))
+        config["items"] = items_paths
+        super().__init__(config)
 
-
-
-class ImagesWithinDirectoryDataset(CompositionDataset):
-    
-    DEFAULT_IMAGES_EXTENSIONS = tuple([".tif", ".jpeg", ".png"])
-    IMAGE_KEY = "image"
-    
-    def __init__(self, root_directory_path, images_extension=DEFAULT_IMAGES_EXTENSIONS):
-        """
-        Args:
-            root_directory_path (str).
-            images_extension (List(str), optional). Defaults to DEFAULT_IMAGES_EXTENSIONS.
-        """
-        
-        is_image_fp = lambda fp:fp.lower().endswith(images_extension)
-        super().__init__(FilteredItemsDataset(FilesWithinDirectoryDataset(root_directory_path), is_image_fp), copy_parent=False)
     
     def __len__(self):
         return len(self.parent_dataset)
