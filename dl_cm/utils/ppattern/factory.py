@@ -5,28 +5,29 @@ from dl_cm.utils.exceptions import OutOfTypesException
 import collections
 from typing import TypeVar, Generic
 import pydantic as pd
-from dl_cm import _logger as logger
 from dl_cm.utils.registery import registeredClassMixin
+from abc import ABC, abstractmethod
 
 class namedEntitySchema(pd.BaseModel):
     name: str
     params: dict = {}
 
 T = TypeVar("T", bound=registeredClassMixin)
-class BaseFactory(Generic[T]):
+class BaseFactory(Generic[T], ABC):
 
     @classmethod
     def registry(cls) -> Registry:
-        raise cls.base_class().registry()
+        return cls.base_class().registry()
     
     @staticmethod
+    @abstractmethod
     def base_class() -> T:
-        raise NotImplementedError
+        pass
     
     @classmethod
+    @abstractmethod
     def default_instance(cls) -> T:
-        logger.critical("Default instance not implemented for factory %s", cls.__name__)
-        raise NotImplementedError
+        pass
 
     @classmethod
     def create(cls, param: str | dict | T | collections.abc.Iterable[T]) -> T | list[T]:
