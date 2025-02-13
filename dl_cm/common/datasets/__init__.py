@@ -28,12 +28,27 @@ class DatasetFactory(BaseFactory):
         return BaseDataset
 
 
-class CompositionDataset(BaseDataset):
+class CompositionDataset(BaseDataset, validationMixin, InitCheckMixin):
 
-    def __init__(self, parent_dataset, copy_parent=True):
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
+        class ValidConfig(pd.BaseModel):
+            parent_dataset: namedEntitySchema | BaseDataset
+            copy_parent: bool = False
+        return ValidConfig
+
+    def __init__(self, config: dict):
+        validationMixin.__init__(self, config)
+        InitCheckMixin.__init__(self)
+        super().__init__(config)
         parent_dataset = DatasetFactory.create(parent_dataset)
-        self.parent_dataset = copy.copy(parent_dataset) if copy_parent else parent_dataset
+        self._parent_dataset = copy.copy(parent_dataset) if config.get("copy_parent", False) else parent_dataset
     
+    @property
+    def parent_dataset(self) -> BaseDataset:
+        self.check_base_class_initialized()
+        return self._parent_dataset
+
     def parent_index(self, index):
         return index
     
