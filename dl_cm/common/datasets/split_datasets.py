@@ -5,12 +5,23 @@ import numpy as np
 from . import CompositionDataset
 import collections
 from dl_cm.common.datasets.items_dataset import ItemsDataset
+from dl_cm.common.datasets import BaseDataset
+import pydantic as pd
+from dl_cm.utils.ppattern.data_validation import validationMixin
 
 # Define a subdataset class that uses these indices
-class SubDataset(CompositionDataset):
-    def __init__(self, parent: ItemsDataset, indices: list[int]):
-        super().__init__(parent, copy_parent=False)
-        self.indices = indices
+class SubDataset(CompositionDataset, validationMixin):
+
+    @staticmethod
+    def config_schema()-> pd.BaseModel:
+        class ValidConfig(pd.BaseModel):
+            indices: list[int] | np.ndarray
+        return ValidConfig
+    
+    def __init__(self, config: dict):
+        validationMixin.__init__(self, config)
+        super().__init__(config)
+        self.indices = config.get("indices")
     
     def __len__(self):
         return len(self.indices)
