@@ -4,15 +4,20 @@ import copy
 from dl_cm.common import DLCM
 from typing import Type
 from dl_cm.utils.ppattern.data_validation import validationMixin
+from dl_cm.utils.ppattern.init_check_mixin import InitCheckMixin
 from dl_cm.common.typing import namedEntitySchema
 import pydantic as pd
 
 DATASETS_REGISTERY = Registry("Datasets")
-class BaseDataset(DLCM, validationMixin):
+LOADED_DATASETS_REGISTRY = Registry("Loaded datasets")
+
+class BaseDataset(DLCM, validationMixin, InitCheckMixin):
 
     @staticmethod
     def config_schema()-> pd.BaseModel:
-        return namedEntitySchema
+        class ValidConfig(namedEntitySchema):
+            reference_name: str = None # this field is used to differentiate between loaded datasets
+        return ValidConfig
 
     @staticmethod
     def registry() -> Registry:
@@ -20,8 +25,18 @@ class BaseDataset(DLCM, validationMixin):
 
     def __init__(self, config: dict) -> None:
         validationMixin.__init__(self, config)
+        InitCheckMixin.__init__(self)
+        ref_name = config.get("reference_name", self.__class__.__name__)
+        if ref_name in LOADED_DATASETS_REGISTRY:
+            raise ValueError(f"Dataset with name {ref_name} is already loaded")
+        LOADED_DATASETS_REGISTRY.register(obj=self, name=ref_name)
+        self._ref_name = ref_name
     
-class DatasetFactory(BaseFactory):
+    @property
+    def reference_name(self) -> str:
+        self.check_base_class_initialized()
+        return self._ref_name
+    
 
     @staticmethod
     def base_class()-> Type["DLCM"]:
