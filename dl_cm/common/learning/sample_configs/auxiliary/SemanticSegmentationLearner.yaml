@@ -17,11 +17,11 @@ learner:
         weights:
           - 1.0
           - 1.0
-    model:
-      name: SemanticSegmentationModel
-      params:
-        arch: Unet
-        encoder_name: resnet50
-        decoder_channels: [128, 128, 64, 64, 32]
-        in_channels: 6
-        classes: 2
+  model:
+    name: SemanticSegmentationModel
+    params:
+      arch: Unet
+      encoder_name: resnet50
+      decoder_channels: [128, 128, 64, 64, 32]
+      in_channels: 6
+      classes: 2

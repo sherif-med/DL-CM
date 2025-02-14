@@ -1,0 +1,17 @@
+learner: 
+  name: SegmentationEquivarianceEnforcedLearner
+  params:
+    segmentation_keys: "seg_map"
+    input_transformations: ["flip_lr", "flip_ud", "rotate_90", "rotate_180", "rotate_270"]
+    output_transformations: ["flip_lr", "flip_ud", "rotate_90", "rotate_180", "rotate_270"] # this is optional and defaults to input_transformations
+    predicted_key: "seg_map"
+  optimizer: 
+    name: AdamW
+    params:
+      lr: 0.0001
+  critireon: 
+    name: acrossDimensionVarianceLoss
+    params:
+      dimensions: 0
+  wraped_learner: # reference to semantic segmentation learner
+    !include: ./auxiliary/SemanticSegmentationLearner.yaml
