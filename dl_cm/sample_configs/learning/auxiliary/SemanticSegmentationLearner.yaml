@@ -1,0 +1,27 @@
+learner: 
+  name: SupervisedLearner
+  params:
+    target_key: target_map
+    predicted_key: seg_map
+  critireon:
+    name: CombinedLoss
+    params:
+      losses:
+        - name: BCEWithLogitsLoss
+          params:
+            pos_weight: null #!tensor 13.4420
+        - name: DiceLoss
+          params: 
+            from_logits: True
+            mode: binary
+      weights:
+        - 1.0
+        - 1.0
+  model:
+    name: SemanticSegmentationModel
+    params:
+      arch: Unet
+      encoder_name: resnet50
+      decoder_channels: [128, 128, 64, 64, 32]
+      in_channels: 6
+      classes: 2
