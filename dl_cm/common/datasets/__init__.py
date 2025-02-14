@@ -37,11 +37,14 @@ class BaseDataset(DLCM, validationMixin, InitCheckMixin):
         self.check_base_class_initialized()
         return self._ref_name
     
+    def compose(self, composition_cls: type["CompositionDataset"], **kwargs) -> "CompositionDataset":
+        return composition_cls({"parent_dataset": self, "copy_parent": False, **kwargs})
+    
+class DatasetFactory(BaseFactory[BaseDataset]):
 
     @staticmethod
-    def base_class()-> Type["DLCM"]:
+    def base_class()-> Type["BaseDataset"]:
         return BaseDataset
-
 
 class CompositionDataset(BaseDataset, validationMixin, InitCheckMixin):
 
