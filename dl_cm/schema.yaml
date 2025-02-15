@@ -3,45 +3,36 @@ experiment_name: str()
 experiment_checkpoint_directory: str()
 experiment_logging_directory: str()
 
-datainfo:
-  preprocessing: 
+datamodule:
+  name: registered_datamodule()
+  params: include('params')
+  preprocessing:
+    apply: bool(required=False)
     name: registered_preprocessing(required=False)
     params: include('params')
-  apply_augmentation: bool(required=False)
+  augmentation:
+    apply: bool(required=False)
+    augmentations: list(registered_augtrans())
   datasets: list(include('dataset'))
-  common_loaders_params: include('common_loaders_params', required=False)
-  dataloaders: list(include('dataloader'))
+  common_loaders_params: map(key=str(), required=False)
+  dataloaders: map(include('dataloader'), key=enum("train", "valid", "test", "predict"))
 
 trainer:
+  name: registered_trainer()
   params: include('params')
   callbacks: list(include('callback'))
   loggers: list(include('logger'))
 
 task:
   name: registered_task()
-  model:
-    params: include('params')
-  task_def: include('params')
-  optimizer: 
-    name: registered_optimizer()
-    params: include('params')
-  lr_scheduler: include('lr_scheduler', required=False)
-  critireon: 
-    name: registered_loss()
-    params: include('params')
-  metrics: list(include('metric'))
-  var_reduction: map(any(), required=False)
+  learner: include('learner')
 
 # Define reusable components
 ---
 dataset:
-  name: str()
-  split_ratio: list(num(),required=False)
-  augmentations: list(registered_augtrans(), required=False)
-  datasettype: 
-    name: registered_dataset()
-    params: include('params')
-  #preprocessing: registered_preprocessing(required=False)
+  name: registered_dataset()
+  reference_name: str(required=False)
+  params: include('params')
 
 dataloader:
   name: str()
@@ -56,28 +47,26 @@ logger:
   name: registered_logger()
   params: include('params')
 
-metric:
-  name: registered_metric()
-  params: include('params')
+learner:
+  name: registered_learner()
+  params: 
+  model: include('model')
+  optimizer: 
+    name: registered_optimizer()
+    params: include('params')
+  lr_scheduler: 
+    name: registered_scheduler()
+    params: include('params')
+  critireon: 
+    name: registered_critireon()
+    params: include('params')
 
-metric_mode:
-  log_on_epoch: bool(required=False)
-  log_on_step: bool(required=False)
-  defs: list(include('metric'))
-
-lr_scheduler:
-  name: registered_scheduler()
+model:
+  name: registered_model()
   params: include('params')
 
 params:  # Reusable component for params
   map(any(), required=False)
-
-common_loaders_params:
-  num_workers: int(required=False)
-  batch_size: int(required=False)
-  shuffle: bool(required=False)
-  drop_last: bool(required=False)
-  collate_fn: str(required=False)
 
 named_entity:
   name: str()
