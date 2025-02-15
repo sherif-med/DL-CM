@@ -29,4 +29,7 @@ class FilteredItemsDataset(CompositionDataset, validationMixin):
         return len(self.filtered_items_indices)
 
     def __getitem__(self, index):
-        return self.parent_dataset[self.filtered_items_indices[index]]
+        return self.parent_dataset[self.parent_index(index)]
+
+    def parent_index(self, index):
+        return self.filtered_items_indices[index]

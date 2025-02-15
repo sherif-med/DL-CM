@@ -48,7 +48,10 @@ class ImagesWithinDirectoryDataset(CompositionDataset, validationMixin):
 
     def __len__(self):
         return len(self.parent_dataset)
-    
+
+    def parent_index(self, index : int) -> int:
+        return index
+
     @staticmethod
     def read_image(fp):
         loaded_tensor = torch.from_numpy(imread(fp))
