@@ -2,8 +2,8 @@
 import logging
 import os
 
-package_logger_name = "dl_cm_logger"
-_logger = logging.getLogger(package_logger_name)
+PACKAGE_LOGGER_NAME = "dl_cm_logger"
+_logger = logging.getLogger(PACKAGE_LOGGER_NAME)
 
 def configure_logging(log_level: int):
     """Configure logging messages for this program."""
@@ -35,3 +35,5 @@ def get_schema_path():
     # Append 'schema.yaml' to this directory
     schema_path = os.path.join(current_dir, "schema.yaml")
     return schema_path
+
+DEFAULT_SCHEMA_PATH = get_schema_path()

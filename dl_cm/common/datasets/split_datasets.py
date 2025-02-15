@@ -17,21 +17,18 @@ class SubDataset(CompositionDataset, validationMixin):
         class ValidConfig(pd.BaseModel):
             indices: list[int] | np.ndarray
         return ValidConfig
-    
+
     def __init__(self, config: dict):
         validationMixin.__init__(self, config)
-        super().__init__(config)
-        self.indices = config.get("indices")
-    
+            self.indices = config.get("indices")
+
     def __len__(self):
         return len(self.indices)
-    
+
     def parent_index(self, index: int):
         return self.indices[index]
-    
+
     def __getitem__(self, idx: int):
-        if idx < 0 or idx >= len(self):
-            raise IndexError("Index out of range")
         real_idx = self.indices[idx]
         return self.parent_dataset.__getitem__(real_idx)
 
@@ -43,12 +40,12 @@ class SplitDataset(CompositionDataset, validationMixin):
             reference_names: list[str]
             split_ratios: list[float]
         return ValidConfig
-    
+
     def __init__(self, config: dict):
         validationMixin.__init__(self, config)
         self.reference_names = config.get("reference_names")
         self.split_ratios = config.get("split_ratios")
-        
+
         if (len(self.reference_names)!= len(self.split_ratios)):
             raise ValueError("Parameters 'reference_names' and 'split_ratios'\
                 should have the same length!")
@@ -56,7 +53,7 @@ class SplitDataset(CompositionDataset, validationMixin):
         self._ref_datasets_map = {
             k:v for k,v in zip(self.reference_names, split_dataset_random(self.parent_dataset, self.split_ratios))
             }
-    
+
     def get_dataset_by_ref_name(self, ref_name: str)-> BaseDataset:
         return self._ref_datasets_map.get(ref_name)
 
@@ -81,10 +78,10 @@ def split_dataset_random(
 
     total_length = len(parent_dataset)
     indices = np.arange(0, total_length, 1)
-    
+
     # Calculate the number of elements for each fraction
     counts = [int(frac * total_length) for frac in fractions]
-    
+
     # Calculate the start index for each subdataset
     starts = np.cumsum([0] + counts)
     ends = starts[1:]
@@ -100,5 +97,5 @@ def split_dataset_random(
         }
         # Create a new subdataset instance for the current subset of indices
         subdatasets.append(SubDataset(c_config))
-    
+
     return subdatasets

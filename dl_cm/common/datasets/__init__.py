@@ -31,15 +31,14 @@ class BaseDataset(DLCM, validationMixin, InitCheckMixin):
             raise ValueError(f"Dataset with name {ref_name} is already loaded")
         LOADED_DATASETS_REGISTRY.register(obj=self, name=ref_name)
         self._ref_name = ref_name
-    
+
     @property
     def reference_name(self) -> str:
         self.check_base_class_initialized()
         return self._ref_name
-    
-    def compose(self, composition_cls: type["CompositionDataset"], **kwargs) -> "CompositionDataset":
+
         return composition_cls({"parent_dataset": self, "copy_parent": False, **kwargs})
-    
+
 class DatasetFactory(BaseFactory[BaseDataset]):
 
     @staticmethod
@@ -61,7 +60,7 @@ class CompositionDataset(BaseDataset, validationMixin, InitCheckMixin):
         super().__init__(config)
         parent_dataset = DatasetFactory.create(parent_dataset)
         self._parent_dataset = copy.copy(parent_dataset) if config.get("copy_parent", False) else parent_dataset
-    
+
     @property
     def parent_dataset(self) -> BaseDataset:
         self.check_base_class_initialized()
@@ -69,13 +68,13 @@ class CompositionDataset(BaseDataset, validationMixin, InitCheckMixin):
 
     def parent_index(self, index):
         return index
-    
+
     def top_parent_index(self, index):
         if not isinstance(self.parent_dataset, CompositionDataset):
             return self.parent_index(index)
         else:
             return self.parent_dataset.top_parent_index(self.parent_index(index)) 
-    
+
     def get_top_dataset(self):
         if not isinstance(self.parent_dataset, CompositionDataset):
             return self.parent_dataset

@@ -1,8 +1,8 @@
 
-import glob, os
+import glob
+import os
 from dl_cm.common.datasets.filtered_dataset import ItemsDataset, FilteredItemsDataset
 from dl_cm.common.datasets import CompositionDataset
-from dl_cm.common.datasets import DATASETS_REGISTERY
 from skimage.io import imread
 import torch
 import pydantic as pd
@@ -15,7 +15,7 @@ class FilesWithinDirectoryDataset(ItemsDataset, validationMixin):
         class ValidConfig(pd.BaseModel):
             directory_path: str
         return ValidConfig
-    
+
     def __init__(self, config: dict):
         validationMixin.__init__(self, config)
         directory_path = config.get("directory_path")
@@ -35,7 +35,7 @@ class ImagesWithinDirectoryDataset(CompositionDataset, validationMixin):
             image_extensions: list[str] = DEFAULT_IMAGES_EXTENSIONS
             image_key: str = IMAGE_KEY
         return ValidConfig
-    
+
     def __init__(self, config: dict):
         validationMixin.__init__(self, config)
         super().__init__(config)
@@ -45,7 +45,7 @@ class ImagesWithinDirectoryDataset(CompositionDataset, validationMixin):
         config["parent_dataset"] = FilteredItemsDataset(FilesWithinDirectoryDataset(root_directory_path), is_image_fp)
         config["copy_parent"] = False
         super().__init__(config)
-    
+
     def __len__(self):
         return len(self.parent_dataset)
     
@@ -55,12 +55,12 @@ class ImagesWithinDirectoryDataset(CompositionDataset, validationMixin):
         if len(loaded_tensor.shape)==2:
             # if 2D image, add band dimension as last dimension
             loaded_tensor = loaded_tensor.unsqueeze(-1)
-        
+
         permutation_index = [i for i in range(2, len(loaded_tensor.shape))] + [0,  1]
         # Apply the permutation to the tensor
         reshaped_tensor = loaded_tensor.permute(*permutation_index)
         return reshaped_tensor
-    
+
     def __getitem__(self, index):
         item_fp = self.parent_dataset[index]
         item = {
@@ -68,4 +68,3 @@ class ImagesWithinDirectoryDataset(CompositionDataset, validationMixin):
             self.image_key:self.read_image(item_fp).float()
         }
         return item
-    

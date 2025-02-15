@@ -50,12 +50,12 @@ class BaseTask(pl.LightningModule, DLCM, validationMixin):
         self.learner : OptimizableLearner = LearnersFactory.create(task_config.get("learner"))
         self.hparams["task_name"] = type(self).__name__
         self.save_hyperparameters(task_config)
-                
+
     def configure_optimizers(self):
         optimizer = self.learner.optimizer
         lr_scheduler = self.learner.lr_scheduler
         return [optimizer], [lr_scheduler]
-    
+
     @staticmethod
     def load_from_checkpoint(ckpt_path:str, **kwargs)->"BaseTask":
         ckpt = torch.load(ckpt_path, map_location="cpu")

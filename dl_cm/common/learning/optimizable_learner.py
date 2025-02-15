@@ -19,7 +19,7 @@ class OptimizableLearner(BaseLearner, validationMixin):
         super().__init__(config=config)
         self._optimizer : BaseOptimizer = None
         self._lr_scheduler : BaseLrScheduler = None
-    
+
     @property
     def optimizer(self)-> list[BaseOptimizer]:
         if self._optimizer is None:
@@ -30,15 +30,14 @@ class OptimizableLearner(BaseLearner, validationMixin):
         if not isinstance(self._optimizer, list):
             self._optimizer = [self._optimizer]
         return self._optimizer
-    
+
     @property
     def lr_scheduler(self)-> list[BaseLrScheduler]:
         if self._lr_scheduler is None:
             lr_scheduler_config = copy.copy(self.config["lr_scheduler"])
             lr_scheduler_config["params"]["optimizer"] = self.model.parameters()
-            self._lr_scheduler = OptimizerFactory.create(lr_scheduler_config)
+            self._lr_scheduler = LrSchedulerFactory.create(lr_scheduler_config)
         # ensure lr_scheduler is a list
         if not isinstance(self._lr_scheduler, list):
             self._lr_scheduler = [self._lr_scheduler]
         return self._lr_scheduler
-    

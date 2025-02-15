@@ -24,7 +24,7 @@ class BaseLearner(torch.nn.Module, validationMixin, DLCM):
         validationMixin.__init__(self, config)
         super().__init__()
         self._model : BaseModel = ModelsFactory.create(config.get("model"))
-    
+
     @property
     def model(self):
         return self._model
