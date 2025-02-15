@@ -16,7 +16,7 @@ class equivarianceEnforcedLearner(learnerWrapper, UnsupervisedLearner, validatio
             input_transformations: list
             output_transformations: list = None
         return ValidConfig
-    
+
     def __init__(self, config):
         validationMixin.__init__(self, config)
         learnerWrapper.__init__(self, config)
@@ -28,7 +28,7 @@ class equivarianceEnforcedLearner(learnerWrapper, UnsupervisedLearner, validatio
                 [GeneralTransformationFactory.create(t) for t in config.get("output_transformations")]
         else:
             self.output_transformations_callable = self.input_transformations_callable
-    
+
     def pre_step(self, batch: StepInputStruct, *args, **kwargs) -> StepInputStruct:
         """
         Apply transformations to the input batch and merge the results into a single batch.
@@ -39,7 +39,7 @@ class equivarianceEnforcedLearner(learnerWrapper, UnsupervisedLearner, validatio
         transformed_batches = [t(batch) for t in self.input_transformations_callable]
         merged_batches = merge_multiple_batches(transformed_batches)
         return merged_batches
-    
+
     def post_step(self, batch: StepOutputStruct, *args, **kwargs) -> StepOutputStruct:
         """
         Perform post-processing on the output batch by reversing transformations and computing losses and predictions.
@@ -54,16 +54,15 @@ class equivarianceEnforcedLearner(learnerWrapper, UnsupervisedLearner, validatio
             reverse_transformed_prediction.append(
                 c_respective_transform(c_prediction, reverse=True)
             )
-            
+
         var_loss : lossOutputStruct = self.criteron_step(reverse_transformed_prediction)
         if (var_loss.losses.keys() & batch.loss.losses.keys()):
             logger.warning(f"Conflicting loss keys {list(var_loss.keys() & batch.loss.keys())}!")
             exit(1)
-        
+
         # adding variance reduction loss to the batch loss and updating the losses dict
         aggregated_var_losses = var_loss.losses[var_loss.name()]
         batch.loss.losses[batch.loss.name()] += aggregated_var_losses # TODO change aggregation of losses
         batch.loss.losses |= var_loss.losses
-        
-        return batch
 
+        return batch
