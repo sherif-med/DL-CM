@@ -40,9 +40,14 @@ class ImagesWithinDirectoryDataset(CompositionDataset, validationMixin):
         validationMixin.__init__(self, config)
         super().__init__(config)
         self.image_key : str = config.get("image_key")
-        is_image_fp = lambda filepath:filepath.lower().endswith(config.get("image_extensions", DEFAULT_IMAGES_EXTENSIONS))
+        def is_image_fp(filepath: str):
+            return filepath.lower().endswith(config.get("image_extensions", DEFAULT_IMAGES_EXTENSIONS))
         root_directory_path = config.get("directory_path")
-        config["parent_dataset"] = FilteredItemsDataset(FilesWithinDirectoryDataset(root_directory_path), is_image_fp)
+        filterd_dataset_config = {
+            "filter_fn":is_image_fp,
+            "parent_dataset":FilesWithinDirectoryDataset(root_directory_path)
+        }
+        config["parent_dataset"] = FilteredItemsDataset(filterd_dataset_config)
         config["copy_parent"] = False
         super().__init__(config)
 

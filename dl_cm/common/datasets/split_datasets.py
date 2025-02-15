@@ -8,18 +8,25 @@ from dl_cm.common.datasets.items_dataset import ItemsDataset
 from dl_cm.common.datasets import BaseDataset
 import pydantic as pd
 from dl_cm.utils.ppattern.data_validation import validationMixin
+from dl_cm.common.typing import namedEntitySchema
+from dl_cm import _logger as logger
 
 # Define a subdataset class that uses these indices
 class SubDataset(CompositionDataset, validationMixin):
 
     @staticmethod
     def config_schema()-> pd.BaseModel:
-        class ValidConfig(pd.BaseModel):
-            indices: list[int] | np.ndarray
+        class ValidConfig(namedEntitySchema):
+            indices: list[int] | np.ndarray = None
         return ValidConfig
 
     def __init__(self, config: dict):
         validationMixin.__init__(self, config)
+        super().__init__(config.get("parent_dataset"))
+        if config.get("indices") is None:
+            logger.warning("No indices provided for subdataset, using all indices!")
+            self.indices = list(range(len(self.parent_dataset)))
+        else:
             self.indices = config.get("indices")
 
     def __len__(self):
@@ -49,9 +56,12 @@ class SplitDataset(CompositionDataset, validationMixin):
         if (len(self.reference_names)!= len(self.split_ratios)):
             raise ValueError("Parameters 'reference_names' and 'split_ratios'\
                 should have the same length!")
-        super().__init__(config)
+        super().__init__(config.get("parent_dataset"))
         self._ref_datasets_map = {
-            k:v for k,v in zip(self.reference_names, split_dataset_random(self.parent_dataset, self.split_ratios))
+            k:v for k,v in zip(
+                self.reference_names,
+                split_dataset_random(self.parent_dataset, self.split_ratios, self.reference_names)
+                )
             }
 
     def get_dataset_by_ref_name(self, ref_name: str)-> BaseDataset:
