@@ -3,20 +3,22 @@ from dl_cm.utils.ppattern.data_validation import validationMixin
 import pydantic as pd
 from dl_cm.utils.registery import Registry
 from dl_cm.common.datasets import DatasetFactory, BaseDataset
+from dl_cm.utils.ppattern.factory import BaseFactory
+from dl_cm.common import DLCM
 from dl_cm.common.datasets.base_dataloader import DataloadersFactory, BaseDataloader
 from dl_cm.common.datasets.preprocessed_dataset import PreprocessingFactory, PreprocessedDataset, BasePreprocessing
 from dl_cm.common.datasets.augmented_dataset import AugmentedDataset, GeneralTransformation, GeneralTransformationFactory
 import pytorch_lightning as pl
 
-DATAMODULES_REGISTRY = Registry("DataModules")
+DATAMODULES_REGISTERY = Registry("DataModules")
 
-class BaseDataModule(pl.LightningDataModule, validationMixin):
+class BaseDataModule(pl.LightningDataModule, DLCM, validationMixin):
 
     @staticmethod
     def config_schema()-> pd.BaseModel:
         class FlaggedNamedEntity(namedEntitySchema):
             apply: bool = True
-        class ValidConfig(pd.BaseModel):
+        class ValidConfig(namedEntitySchema):
             datasets: dict[str, namedEntitySchema]
             dataloaders: dict[str, namedEntitySchema]
             common_dataloader_params: dict = {}
@@ -40,19 +42,25 @@ class BaseDataModule(pl.LightningDataModule, validationMixin):
             augmentations : list[GeneralTransformation] = GeneralTransformationFactory.create(augmentation_config.get("augmentations"))
             self.datasets = [d.compose(AugmentedDataset, augmentations=augmentations) for d in self.datasets]
         # Dataloaders
-        self.dataloaders : dict[str,BaseDataloader] = []
+        self.dataloaders : dict[str,BaseDataloader] = {}
         for dataloader_mode, dataloader_config in config.get("dataloaders").items():
             dataloader_config["params"] |= config.get("common_dataloader_params")
             self.dataloaders[dataloader_mode](DataloadersFactory.create(dataloader_config))
     
     def train_dataloader(self):
-        return self.dataloaders["train"]
+        return self.dataloaders.get("train")
     
     def val_dataloader(self):
-        return self.dataloaders["valid"]
+        return self.dataloaders.get("valid")
     
     def test_dataloader(self):
-        return self.dataloaders["test"]
+        return self.dataloaders.get("test")
     
     def predict_dataloader(self):
-        return self.dataloaders["predict"]
+        return self.dataloaders.get("predict")
+
+class DataModulesFactory(BaseFactory[BaseDataModule]):
+    
+    @staticmethod
+    def base_class()-> type["BaseDataModule"]:
+        return BaseDataModule

@@ -44,6 +44,7 @@ from dl_cm.common.tasks.metrics import METRICS_REGISTRY
 from dl_cm.common.tasks.optimizer import LR_SCHEDULER_REGiSTERY, OPTIMIZER_REGiSTERY
 from dl_cm.common.trainers.callbacks import CALLBACKS_REGISTERY
 from dl_cm.common.trainers.loggers import LOGGERS_REGISTERY
+from dl_cm.common.datasets.datamodule import DATAMODULES_REGISTERY
 from dl_cm.config_loaders import open_config_file
 
 
@@ -76,6 +77,7 @@ _registries_validators = {
     "registered_scheduler": LR_SCHEDULER_REGiSTERY,
     "registered_model": MODELS_REGISTERY,
     "registered_learner": LEARNERS_REGISTERY,
+    "registered_datamodule": DATAMODULES_REGISTERY,
 }
 
 _extended_validators = DefaultValidators.copy()
