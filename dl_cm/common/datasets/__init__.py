@@ -1,37 +1,43 @@
-from typing import TypeVar, Generic, Type
-from dl_cm.utils.registery import Registry
-from dl_cm.utils.ppattern.factory import BaseFactory
 import copy
-from dl_cm.common import DLCM
-from dl_cm.utils.ppattern.data_validation import validationMixin
-from dl_cm.utils.ppattern.init_check_mixin import InitCheckMixin
-from dl_cm.common.typing import namedEntitySchema
-import pydantic as pd
 from abc import ABC, abstractmethod
+from collections import defaultdict
+from typing import Generic, Type, TypeVar
+
+from pydantic import ConfigDict, validate_call
+
+from dl_cm.common import DLCM
+from dl_cm.common.typing import namedEntitySchema
+from dl_cm.utils.ppattern.factory import BaseFactory
+from dl_cm.utils.registery import Registry
 
 DATASETS_REGISTERY = Registry("Datasets")
 LOADED_DATASETS_REGISTRY = Registry("Loaded datasets")
 
-class BaseDataset(DLCM, validationMixin, InitCheckMixin):
+COMPOSITION_DATASET_CLASS = TypeVar(
+    "COMPOSITION_DATASET_CLASS_T", bound="CompositionDataset"
+)
 
-    @staticmethod
-    def config_schema()-> pd.BaseModel:
-        class ValidConfig(namedEntitySchema):
-            reference_name: str = None # this field is used to differentiate between loaded datasets
-        return ValidConfig
+
+class BaseDataset(DLCM):
+    _non_ref_datasets_counter = defaultdict(int)
 
     @staticmethod
     def registry() -> Registry:
         return DATASETS_REGISTERY
 
-    def __init__(self, config: dict) -> None:
-        validationMixin.__init__(self, config)
-        InitCheckMixin.__init__(self)
-        ref_name = config.get("reference_name", self.__class__.__name__)
-        if ref_name in LOADED_DATASETS_REGISTRY:
-            raise ValueError(f"Dataset with name {ref_name} is already loaded")
-        LOADED_DATASETS_REGISTRY.register(obj=self, name=ref_name)
-        self._ref_name = ref_name
+    @validate_call
+    def __init__(
+        self, reference_name: str = None, is_in_memory=False, *args, **kwargs
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self._is_in_memory = is_in_memory
+        if reference_name is None:
+            reference_name = f"{self.__class__.__name__}_{BaseDataset._non_ref_datasets_counter[self.__class__]}"
+            BaseDataset._non_ref_datasets_counter[self.__class__] += 1
+        self._ref_name = reference_name
+        if reference_name in LOADED_DATASETS_REGISTRY:
+            raise ValueError(f"Dataset with name {reference_name} is already loaded")
+        LOADED_DATASETS_REGISTRY.register(obj=self, name=self._ref_name)
 
     @property
     def reference_name(self) -> str:
@@ -40,10 +46,15 @@ class BaseDataset(DLCM, validationMixin, InitCheckMixin):
 
         This attribute is available only after the dataset is fully initialized.
         """
-        self.check_base_class_initialized()
         return self._ref_name
 
-    def compose(self, composition_cls: Type["CompositionDataset"], **kwargs) -> "CompositionDataset":
+    @property
+    def is_in_memory(self) -> bool:
+        return self._is_in_memory
+
+    def compose(
+        self, composition_cls: Type[COMPOSITION_DATASET_CLASS], *args, **kwargs
+    ) -> COMPOSITION_DATASET_CLASS:
         """Compose a new dataset with the given composition class and kwargs.
 
         Args:
@@ -53,38 +64,45 @@ class BaseDataset(DLCM, validationMixin, InitCheckMixin):
         Returns:
             An instance of the composition class with the current dataset as the parent dataset
         """
-        return composition_cls({"parent_dataset": self, "copy_parent": False, **kwargs})
+        return composition_cls[COMPOSITION_DATASET_CLASS](
+            parent_dataset=self, copy_parent=False, *args, **kwargs
+        )
+
 
 class DatasetFactory(BaseFactory[BaseDataset]):
-
     @staticmethod
-    def base_class()-> Type["BaseDataset"]:
+    def base_class() -> Type["BaseDataset"]:
         return BaseDataset
 
-COMPOSED_DATASET_CLASS = TypeVar('COMPOSED_CLASS', bound=BaseDataset)
-class CompositionDataset(BaseDataset, validationMixin, InitCheckMixin, ABC, Generic[COMPOSED_DATASET_CLASS]):
 
-    @staticmethod
-    def config_schema()-> pd.BaseModel:
-        class ValidConfig(pd.BaseModel):
-            parent_dataset: namedEntitySchema | BaseDataset
-            copy_parent: bool = False
-        return ValidConfig
+COMPOSED_DATASET_CLASS = TypeVar("COMPOSED_CLASS", bound=BaseDataset)
 
-    def __init__(self, config: dict):
-        validationMixin.__init__(self, config)
-        InitCheckMixin.__init__(self)
-        super().__init__(config)
-        parent_dataset : COMPOSED_DATASET_CLASS = DatasetFactory.create(config.get("parent_dataset"))
-        self._parent_dataset : COMPOSED_DATASET_CLASS = copy.copy(parent_dataset) if config.get("copy_parent") else parent_dataset
+
+class CompositionDataset(BaseDataset, ABC, Generic[COMPOSED_DATASET_CLASS]):
+    @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+    def __init__(
+        self,
+        parent_dataset: namedEntitySchema | COMPOSED_DATASET_CLASS,
+        copy_parent: bool = False,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        parent_dataset: COMPOSED_DATASET_CLASS = DatasetFactory.create(parent_dataset)
+        self._parent_dataset: COMPOSED_DATASET_CLASS = (
+            copy.copy(parent_dataset) if copy_parent else parent_dataset
+        )
 
     @property
     def parent_dataset(self) -> COMPOSED_DATASET_CLASS:
-        self.check_base_class_initialized()
         return self._parent_dataset
 
+    @property
+    def is_in_memory(self) -> bool:
+        return self.parent_dataset.is_in_memory
+
     @abstractmethod
-    def parent_index(self, index : int) -> int:
+    def parent_index(self, index: int) -> int:
         """
         Abstract method to get the index in the parent dataset corresponding to the given index in the current dataset.
 
@@ -125,5 +143,5 @@ class CompositionDataset(BaseDataset, validationMixin, InitCheckMixin, ABC, Gene
         else:
             return self.parent_dataset.get_top_dataset()
 
-from . import combined_dataset
-from . import shuffled_dataset
+
+from . import combined_dataset, shuffled_dataset
