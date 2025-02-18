@@ -1,33 +1,54 @@
+"""
+Module containing the BaseFactory class, which provides a base class for creating factories in the
+dl_cm framework. A factory is responsible for creating instances of a particular class, and this
+module provides a generic way to implement factories. The BaseFactory class provides a way to
+create instances of a class from a variety of input parameters, including strings, dictionaries,
+and instances of the class itself.
+"""
+
+import collections
 import collections.abc
-from dl_cm.utils.registery import Registry
+from abc import ABC, abstractmethod
+from typing import Generic, TypeVar
+
 from dl_cm.config_loaders import load_named_entity
 from dl_cm.utils.exceptions import OutOfTypesException
-import collections
-from typing import TypeVar, Generic
-import pydantic as pd
-from dl_cm.utils.registery import registeredClassMixin
-from abc import ABC, abstractmethod
-
-class namedEntitySchema(pd.BaseModel):
-    name: str
-    params: dict = {}
+from dl_cm.utils.registery import Registry, registeredClassMixin
 
 T = TypeVar("T", bound=registeredClassMixin)
+
+
 class BaseFactory(Generic[T], ABC):
+    """
+    A base class for creating factories.
+    The BaseFactory class has the following methods:
+        - registry: Returns the registry of classes associated with the factory.
+        - base_class: Returns the base class of the factory.
+        - default_instance: Returns a default instance of the class.
+        - create: Creates an instance of the class from a variety of input parameters.
+    """
 
     @classmethod
     def registry(cls) -> Registry:
         return cls.base_class().registry()
-    
+
     @staticmethod
     @abstractmethod
     def base_class() -> T:
-        pass
-    
+        """
+        Return the base class associated with the factory.
+        This method should be overridden by subclasses to return the specific base class
+        that the factory is responsible for creating instances of.
+        """
+
     @classmethod
     @abstractmethod
     def default_instance(cls) -> T:
-        pass
+        """
+        Return a default instance of the class associated with the factory.
+        This method should be overridden by subclasses to provide a default instance
+        of the specific class that the factory is responsible for creating.
+        """
 
     @classmethod
     def create(cls, param: str | dict | T | collections.abc.Iterable[T]) -> T | list[T]:
@@ -53,7 +74,7 @@ class BaseFactory(Generic[T], ABC):
             If the param is not of the expected types.
         """
 
-        if not param:
+        if param is None:
             return cls.default_instance()
         if isinstance(param, str):
             dataset_class = cls.registry().get(param)
@@ -65,4 +86,11 @@ class BaseFactory(Generic[T], ABC):
         elif isinstance(param, collections.abc.Iterable):
             return type(param)(cls.create(p) for p in param)
         else:
-            raise OutOfTypesException(param, (str, dict, cls.base_class(),))
+            raise OutOfTypesException(
+                param,
+                (
+                    str,
+                    dict,
+                    cls.base_class(),
+                ),
+            )
