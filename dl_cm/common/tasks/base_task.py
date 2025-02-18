@@ -1,31 +1,10 @@
 import pytorch_lightning as pl
 import torch
 from dl_cm.common import DLCM
-from dl_cm.common.tasks import TASKS_REGISTERY
-from typing import Dict
-from dl_cm.common.typing import lossOutputStruct, Registry
-from dataclasses import dataclass
-import pydantic as pd
+from dl_cm.utils.registery import Registry
 from dl_cm.common.learning import LearnersFactory
 from dl_cm.common.learning.optimizable_learner import OptimizableLearner
-from dl_cm.common.typing import namedEntitySchema, Any
-from dl_cm.utils.ppattern.data_validation import validationMixin
-
-@dataclass
-class StepOutputStruct:
-    loss: lossOutputStruct | torch.Tensor
-    predictions: Dict[str, Any] | torch.Tensor
-    targets: Dict[str, Any] | torch.Tensor = None
-    inputs: Dict | torch.Tensor = None
-    metadata: Dict = None
-    auxiliary: Dict = None
-
-@dataclass
-class StepInputStruct:
-    inputs: Dict[str, Any] | torch.Tensor
-    targets: Dict[str, Any] | torch.Tensor = None
-    metadata: Dict = None
-    auxiliary: Dict = None
+TASKS_REGISTERY = Registry("Tasks")
 
 class BaseTask(pl.LightningModule, DLCM, validationMixin):
     """
@@ -64,3 +43,9 @@ class BaseTask(pl.LightningModule, DLCM, validationMixin):
         del ckpt
         loaded_task = task_class.load_from_checkpoint(ckpt_path, **kwargs)
         return loaded_task
+
+class TasksFactory(BaseFactory[BaseTask]):
+
+    @staticmethod
+    def base_class()-> type[BaseTask]:
+        return BaseTask
