@@ -1,37 +1,29 @@
-from dl_cm.common.datasets import BaseDataset, DatasetFactory
 import bisect
 import itertools
-import pydantic as pd
-from dl_cm.utils.ppattern.data_validation import validationMixin
+
+from dl_cm.common.datasets import BaseDataset, DatasetFactory
 from dl_cm.common.typing import namedEntitySchema
 
 
-class CombinedDataset(BaseDataset, validationMixin):
+class CombinedDataset(BaseDataset):
 
-    @staticmethod
-    def config_schema()-> pd.BaseModel:
-        class ValidConfig(pd.BaseModel):
-            datasets: list[namedEntitySchema]
-        return ValidConfig
-    
-    def __init__(self, config: dict):
-        validationMixin.__init__(self, config)
-        super().__init__(config)
-        self.datasets : list[BaseDataset] = DatasetFactory.create(config.get("datasets"))
-        
+    def __init__(self, datasets: list[namedEntitySchema | BaseDataset], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.datasets : list[BaseDataset] = DatasetFactory.create(datasets)
+
         self.datasets_lengths = [len(d) for d in self.datasets]
         self.cumulative_lengths = [0] + list(itertools.accumulate(self.datasets_lengths))
-        
+
         self.total_length = sum(self.datasets_lengths)
-    
-    
+
+
     def __len__(self):
         return self.total_length
-    
+
     def respective_dataset_index(self, index):
         dataset_idx = bisect.bisect_right(self.cumulative_lengths, index) - 1
         return dataset_idx
-           
+
     def __getitem__(self, idx):
         if idx < 0:
             idx += len(self)
@@ -43,4 +35,3 @@ class CombinedDataset(BaseDataset, validationMixin):
         dataset_idx = self.respective_dataset_index(idx)
         dataset_offset = self.cumulative_lengths[dataset_idx]
         return self.datasets[dataset_idx][idx - dataset_offset]
-
