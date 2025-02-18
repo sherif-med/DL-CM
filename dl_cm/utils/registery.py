@@ -1,3 +1,6 @@
+from abc import ABC, abstractmethod
+from typing import Callable
+
 
 class Registry:
     """
@@ -10,19 +13,22 @@ class Registry:
     """
 
     def __init__(self, name):
-
         self._name = name
         self._obj_map = {}
 
     def _do_register(self, name, obj):
-
-        assert (
-            name not in self._obj_map
-        ), f"An object named '{name}' was already registered in '{self._name}' registry!"
+        assert name not in self._obj_map, (
+            f"An object named '{name}' was already registered in '{self._name}' registry!"
+        )
 
         self._obj_map[name] = obj
 
-    def register(self, obj=None, name: str=None, base_class_adapter : callable[[type], type]=lambda x: x):
+    def register(
+        self,
+        obj=None,
+        name: str = None,
+        base_class_adapter: Callable[[type], type] = lambda x: x,
+    ):
         """
         Method to register an object in the registry
 
@@ -92,8 +98,13 @@ class Registry:
     def __iter__(self):
         return iter(self._obj_map.items())
 
-from abc import ABC, abstractmethod
+
 class registeredClassMixin(ABC):
+    """
+    Mixin class to be used as a base class for all classes that are to be registered in a registry.
+    This class requires the subclass to implement the registry method which should return the
+    registry instance used to register the class.
+    """
 
     @staticmethod
     @abstractmethod
