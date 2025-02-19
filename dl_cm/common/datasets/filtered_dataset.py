@@ -1,24 +1,15 @@
-from dl_cm.common.datasets import CompositionDataset
-from dl_cm.common.datasets.items_dataset import ItemsDataset
-import pydantic as pd
-from dl_cm.utils.ppattern.data_validation import validationMixin
-from dl_cm.common.functions import FunctionsFactory
 from typing import Callable
 
-class FilteredItemsDataset(CompositionDataset, validationMixin):
+from dl_cm.common.datasets import COMPOSED_DATASET_CLASS, CompositionDataset
+from dl_cm.common.functions import FunctionsFactory
 
-    @staticmethod
-    def config_schema()-> pd.BaseModel:
-        class ValidConfig(pd.BaseModel):
-            filter_fn: str | Callable
-        return ValidConfig
 
-    def __init__(self, config: dict):
-        validationMixin.__init__(self, config)
-        super().__init__(config)
-        if not isinstance(self.parent_dataset, ItemsDataset):
+class FilteredItemsDataset(CompositionDataset[COMPOSED_DATASET_CLASS]):
+    def __init__(self, filter_fn: str | Callable, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.is_in_memory:
             raise TypeError(f"Expected ItemsDataset, got {type(self.parent_dataset)}")
-        filter_fn = FunctionsFactory.create(config.get("filter_fn"))
+        filter_fn = FunctionsFactory.create(filter_fn)
         self.filtered_items_indices = []
 
         for idx, item in enumerate(self.parent_dataset):
