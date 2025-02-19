@@ -1,49 +1,41 @@
+from typing import Callable, Type
 
-from dl_cm.utils.registery import Registry
-from typing import Callable
-from dl_cm.common.datasets import CompositionDataset
 from dl_cm.common import DLCM
-from typing import Type
+from dl_cm.common.datasets import COMPOSED_DATASET_CLASS, CompositionDataset
 from dl_cm.utils.ppattern.factory import BaseFactory
-from dl_cm.utils.ppattern.data_validation import validationMixin
-import pydantic as pd
+from dl_cm.utils.registery import Registry
 
 PREPROCESSING_REGISTERY = Registry("Preprocessing")
+
 
 class BasePreprocessing(DLCM):
     @staticmethod
     def registry() -> Registry:
         return PREPROCESSING_REGISTERY
 
+
 class PreprocessingFactory(BaseFactory[BasePreprocessing]):
-    
     @staticmethod
-    def base_class()-> Type["DLCM"]:
+    def base_class() -> Type["DLCM"]:
         return BasePreprocessing
-    
+
+
 @PREPROCESSING_REGISTERY.register(name="id")
 class PreprocessingId(BasePreprocessing):
     def __init__(self):
         pass
+
     def __call__(self, item):
         return item
 
 
-class PreprocessedDataset(CompositionDataset, validationMixin):
+class PreprocessedDataset(CompositionDataset[COMPOSED_DATASET_CLASS]):
+    def __init__(self, preprocessing_fn: str | Callable = "id", *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.preprocessing_callable = PreprocessingFactory.create(preprocessing_fn)
 
-    @staticmethod
-    def config_schema()-> pd.BaseModel:
-        class ValidConfig(pd.BaseModel):
-            preprocessing_fn: str | Callable = "id"
-        return ValidConfig
-    
-    def __init__(self, config: dict):
-        validationMixin.__init__(self, config)
-        super().__init__(config)
-        self.preprocessing_callable = PreprocessingFactory.create(config.get("preprocessing_fn"))
-    
     def __len__(self):
         return len(self.parent_dataset)
-    
+
     def __getitem__(self, index):
         return self.preprocessing_callable(self.parent_dataset[index])
