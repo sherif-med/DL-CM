@@ -1,12 +1,18 @@
-
-from typing import Any
-import torch
+from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import Any, TypeAlias, TypeVar
+
 import pydantic as pd
+import torch
+
+TT = TypeVar("TT")
+OneOrMany: TypeAlias = TT | Iterable[TT]
+
 
 class namedEntitySchema(pd.BaseModel):
     name: str
     params: dict = {}
+
 
 @dataclass
 class lossOutputStruct:
@@ -16,6 +22,7 @@ class lossOutputStruct:
     def value(self):
         return self.losses[self.name]
 
+
 @dataclass
 class StepOutputStruct:
     loss: lossOutputStruct | torch.Tensor
@@ -24,6 +31,7 @@ class StepOutputStruct:
     inputs: dict | torch.Tensor = None
     metadata: dict = None
     auxiliary: dict = None
+
 
 @dataclass
 class StepInputStruct:
