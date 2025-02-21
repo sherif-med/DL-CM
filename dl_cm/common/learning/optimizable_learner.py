@@ -1,43 +1,59 @@
-from dl_cm.common.tasks.optimizer import OptimizerFactory, BaseOptimizer, LrSchedulerFactory, BaseLrScheduler
 from dl_cm.common.learning.base_learner import BaseLearner
-import pydantic as pd
-from dl_cm.common.typing import namedEntitySchema
-from dl_cm.utils.ppattern.data_validation import validationMixin
-import copy
+from dl_cm.common.tasks.optimizer import (
+    BaseLrScheduler,
+    BaseOptimizer,
+    LrSchedulerFactory,
+    OptimizerFactory,
+)
+from dl_cm.common.typing import OneOrMany, namedEntitySchema
 
-class OptimizableLearner(BaseLearner, validationMixin):
 
-    @staticmethod
-    def config_schema()-> pd.BaseModel:
-        class ValidConfig(namedEntitySchema):
-            optimizer: namedEntitySchema | list[namedEntitySchema] = None
-            lr_scheduler: namedEntitySchema | list[namedEntitySchema] = None
-        return ValidConfig
+class OptimizableLearner(BaseLearner):
+    def __init__(
+        self,
+        optimizers: OneOrMany[namedEntitySchema | BaseOptimizer],
+        lr_schedulers: OneOrMany[namedEntitySchema | BaseLrScheduler],
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self._optimizers: BaseOptimizer = []
+        if isinstance(optimizers, list):
+            self._optimizers = optimizers
+        else:
+            self._optimizers = [optimizers]
+        self._lr_schedulers: BaseLrScheduler = []
+        if isinstance(lr_schedulers, list):
+            self._lr_schedulers = lr_schedulers
+        else:
+            self._lr_schedulers = [lr_schedulers]
 
-    def __init__(self, config: dict):
-        validationMixin.__init__(self, config)
-        super().__init__(config=config)
-        self._optimizer : BaseOptimizer = None
-        self._lr_scheduler : BaseLrScheduler = None
+    def init_optimizer(
+        self, optimizer_conf: namedEntitySchema | BaseOptimizer
+    ) -> BaseOptimizer:
+        if isinstance(optimizer_conf, BaseOptimizer):
+            return optimizer_conf
+        optimizer_conf["params"]["params"] = self.model.parameters()
+        return OptimizerFactory.create(optimizer_conf)
+
+    def init_lr_scheduler(
+        self, lr_scheduler_conf: namedEntitySchema | BaseLrScheduler
+    ) -> BaseLrScheduler:
+        if isinstance(lr_scheduler_conf, BaseLrScheduler):
+            return lr_scheduler_conf
+        lr_scheduler_conf["params"]["optimizer"] = self.optimizers
+        return LrSchedulerFactory.create(lr_scheduler_conf)
 
     @property
-    def optimizer(self)-> list[BaseOptimizer]:
-        if self._optimizer is None:
-            optimizer_config = copy.copy(self.config["optimizer"])
-            optimizer_config["params"]["params"] = self.model.parameters()
-            self._optimizer = OptimizerFactory.create(optimizer_config)
-        # ensure optimizer is a list
-        if not isinstance(self._optimizer, list):
-            self._optimizer = [self._optimizer]
-        return self._optimizer
+    def optimizers(self) -> list[BaseOptimizer]:
+        if all(map(lambda o: isinstance(o, BaseOptimizer), self._optimizers)):
+            return self._optimizers
+        self._optimizers = [self.init_optimizer(o) for o in self._optimizers]
+        return self._optimizers
 
     @property
-    def lr_scheduler(self)-> list[BaseLrScheduler]:
-        if self._lr_scheduler is None:
-            lr_scheduler_config = copy.copy(self.config["lr_scheduler"])
-            lr_scheduler_config["params"]["optimizer"] = self.model.parameters()
-            self._lr_scheduler = LrSchedulerFactory.create(lr_scheduler_config)
-        # ensure lr_scheduler is a list
-        if not isinstance(self._lr_scheduler, list):
-            self._lr_scheduler = [self._lr_scheduler]
-        return self._lr_scheduler
+    def lr_schedulers(self) -> list[BaseLrScheduler]:
+        if all(map(lambda o: isinstance(o, BaseLrScheduler), self._lr_schedulers)):
+            return self._lr_schedulers
+        self._lr_schedulers = [self.init_lr_scheduler(o) for o in self._lr_schedulers]
+        return self._lr_schedulers
