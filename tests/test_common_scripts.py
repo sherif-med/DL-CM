@@ -1,5 +1,5 @@
 import unittest
-from src.scripts.common_scripts import chain_decorators
+from dl_cm.scripts.common_scripts import chain_decorators
 
 class TestCommonScripts(unittest.TestCase):
     def test_chain_decorators(self):

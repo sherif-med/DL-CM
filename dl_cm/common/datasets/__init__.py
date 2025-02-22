@@ -142,6 +142,3 @@ class CompositionDataset(BaseDataset, ABC, Generic[COMPOSED_DATASET_CLASS]):
             return self.parent_dataset
         else:
             return self.parent_dataset.get_top_dataset()
-
-
-from . import combined_dataset, shuffled_dataset
