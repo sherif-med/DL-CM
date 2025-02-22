@@ -1,0 +1,40 @@
+[project]
+name = "DL-CM"
+version = "0.2.0"
+description = "DL-CM is a Python library designed to streamline common tasks in deep learning and foster innovation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.1.8",
+    "lightning>=2.5.0.post0",
+    "matplotlib>=3.10.0",
+    "pydantic>=2.10.6",
+    "scikit-image>=0.25.2",
+    "tensorboardx>=2.6.2.2",
+    "torch>=2.6.0",
+    "torchmetrics>=1.6.1",
+    "torchvision>=0.21.0",
+    "yamale>=6.0.0",
+]
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch]
+[tool.hatch.build]
+include = [
+    "README.md",
+    "dl_cm/schema.yaml",
+    "dl_cm/sample_configs/**",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["dl_cm"]
