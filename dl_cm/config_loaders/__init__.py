@@ -1,6 +1,9 @@
+import os
+from pathlib import Path
 
 import torch
 import yaml
+
 
 # Define a custom constructor for the `!tensor` tag
 def tensor_constructor(loader, node):
@@ -17,20 +20,45 @@ def tensor_constructor(loader, node):
         # Convert the list of values to the appropriate dtype
         tensor_value = [float(i) for i in value]
     else:
-        raise TypeError(f"Unsupported YAML node type: {type(node)}. Only scalar and sequence nodes are supported.")
-    
+        raise TypeError(
+            f"Unsupported YAML node type: {type(node)}. Only scalar and sequence nodes are supported."
+        )
+
     return torch.tensor(tensor_value, dtype=torch.float32)
 
-# Add the constructor to the PyYAML loader
-yaml.SafeLoader.add_constructor('!tensor', tensor_constructor)
 
-def open_config_file(conf_file_path: str) -> dict :
+# Add the constructor to the PyYAML loader
+yaml.SafeLoader.add_constructor("!tensor", tensor_constructor)
+
+
+def include_constructor(loader, node):
+    # Get the path of the current YAML file
+    current_file = loader.name
+    current_dir = os.path.dirname(current_file)
+
+    # Get the relative path from the node's value
+    relative_path = loader.construct_scalar(node)
+
+    # Resolve the absolute path
+    file_path = Path(current_dir, relative_path).resolve().as_posix()
+    # Load and return the content of the included YAML file
+    with open(file_path, "r") as f:
+        return yaml.load(f, Loader=type(loader))
+
+
+# Add the constructor to the PyYAML loader
+yaml.add_constructor("!include", include_constructor, Loader=yaml.SafeLoader)
+
+
+def open_config_file(conf_file_path: str) -> dict:
     with open(conf_file_path, "r") as f:
         config = yaml.safe_load(f)
         return config
 
+
 def load_named_entity(registry, entity_config):
     entity_cls = registry.get(entity_config.get("name"))
     entity_params = entity_config.get("params")
-    if entity_params is None: entity_params = {}
+    if entity_params is None:
+        entity_params = {}
     return entity_cls(**entity_params)
