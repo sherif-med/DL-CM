@@ -25,14 +25,17 @@ Example
 >>> python train.py --config path/to/config.yaml --ckpt path/to/checkpoint
 
 """
+
 # pylint: disable=no-value-for-parameter
 from pytorch_lightning import seed_everything
-from dl_cm.scripts import BaseTrainingCommand
+
 from dl_cm.common.datasets.datamodule import DataModulesFactory
-from dl_cm.common.trainers.base_trainer import TrainerFactory
 from dl_cm.common.tasks import TasksFactory
-from dl_cm.utils.config_validation import validate_config
+from dl_cm.common.trainers.base_trainer import TrainerFactory
 from dl_cm.config_loaders import open_config_file
+from dl_cm.scripts import BaseTrainingCommand
+from dl_cm.utils.config_validation import validate_config
+
 
 @BaseTrainingCommand
 def train(config_path: str, ckpt_path: str, seed: int = -1):
@@ -52,15 +55,16 @@ def train(config_path: str, ckpt_path: str, seed: int = -1):
         Random seed to use for training. If -1, no seeding is performed.
 
     """
-    if seed!=-1:
+    if seed != -1:
         seed_everything(seed, workers=True)
-    validate_config(config_path, True)
-    config : dict = open_config_file(config_path)
+    validate_config(config_path)
+    config: dict = open_config_file(config_path)
     loaded_datamodule = DataModulesFactory.create(config.get("datamodule"))
     loaded_trainer = TrainerFactory.create(config.get("trainer"))
     loaded_task = TasksFactory.create(config.get("task"))
     loaded_task.to("cuda")
     loaded_trainer.fit(loaded_task, datamodule=loaded_datamodule, ckpt_path=ckpt_path)
+
 
 if __name__ == "__main__":
     train()

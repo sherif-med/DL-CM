@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import Callable, Hashable
 
 
 class Registry:
@@ -92,7 +92,9 @@ class Registry:
 
         return list(self._obj_map.keys())
 
-    def __contains__(self, name):
+    def __contains__(self, name: Hashable):
+        if not isinstance(name, Hashable):
+            raise TypeError(f"Required item must be hashable, but got {type(name)}")
         return name in self._obj_map
 
     def __iter__(self):

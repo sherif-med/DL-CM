@@ -27,13 +27,15 @@ Example
 """
 
 from functools import partial
-import sys
 
 import yamale
+from pydantic import ConfigDict, validate_call
 from yamale.validators import DefaultValidators, Validator
 
 from dl_cm import DEFAULT_SCHEMA_PATH
+from dl_cm import _logger as logger
 from dl_cm.common.datasets import DATASETS_REGISTERY
+from dl_cm.common.datasets.datamodule import DATAMODULES_REGISTERY
 from dl_cm.common.datasets.preprocessed_dataset import PREPROCESSING_REGISTERY
 from dl_cm.common.datasets.transformations import TRANSFORMATION_REGISTRY
 from dl_cm.common.learning import LEARNERS_REGISTERY
@@ -42,9 +44,9 @@ from dl_cm.common.tasks import TASKS_REGISTERY
 from dl_cm.common.tasks.criterion import CRITIREON_REGISTRY
 from dl_cm.common.tasks.metrics import METRICS_REGISTRY
 from dl_cm.common.tasks.optimizer import LR_SCHEDULER_REGiSTERY, OPTIMIZER_REGiSTERY
+from dl_cm.common.trainers.base_trainer import TRAINERS_REGISTERY
 from dl_cm.common.trainers.callbacks import CALLBACKS_REGISTERY
 from dl_cm.common.trainers.loggers import LOGGERS_REGISTERY
-from dl_cm.common.datasets.datamodule import DATAMODULES_REGISTERY
 from dl_cm.config_loaders import open_config_file
 
 
@@ -78,6 +80,7 @@ _registries_validators = {
     "registered_model": MODELS_REGISTERY,
     "registered_learner": LEARNERS_REGISTERY,
     "registered_datamodule": DATAMODULES_REGISTERY,
+    "registered_trainer": TRAINERS_REGISTERY,
 }
 
 _extended_validators = DefaultValidators.copy()
@@ -85,6 +88,7 @@ for key, val_reg in _registries_validators.items():
     _extended_validators[key] = partial(RegistryValidator, key, val_reg)
 
 
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def validate_config(
     config_path: str,
     schema_path: str = DEFAULT_SCHEMA_PATH,
@@ -108,11 +112,11 @@ def validate_config(
 
     try:
         yamale.validate(config_schema, data)
-        print("Validation success! 👍")
+        logger.info("Validation success! 👍")
     except yamale.YamaleError as e:
-        print("Validation failed!\n")
+        logger.info("Validation failed!\n")
         for result in e.results:
-            print(f"Error validating data '{result.data}' with '{result.schema}'")
+            logger.error(f"validating data '{result.data}' with '{result.schema}'")
             for error in result.errors:
-                print(f"\tError: {error}")
-        sys.exit(1)
+                logger.error(f"{error}")
+        exit(1)
