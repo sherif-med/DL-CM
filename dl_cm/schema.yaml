@@ -5,17 +5,17 @@ experiment_logging_directory: str()
 
 datamodule:
   name: registered_datamodule()
-  params: include('params')
-  preprocessing:
-    apply: bool(required=False)
-    name: registered_preprocessing(required=False)
-    params: include('params')
-  augmentation:
-    apply: bool(required=False)
-    augmentations: list(registered_augtrans())
-  datasets: list(include('dataset'))
-  common_loaders_params: map(key=str(), required=False)
-  dataloaders: map(include('dataloader'), key=enum("train", "valid", "test", "predict"))
+  params:
+    preprocessing:
+      apply: bool(required=False)
+      name: registered_preprocessing(required=False)
+      params: include('params')
+    augmentation:
+      apply: bool(required=False)
+      augmentations: list(include('named_entity'))
+    datasets: list(include('dataset'))
+    common_loaders_params: map(key=str(), required=False)
+    dataloaders: map(include('dataloader'), key=enum("train", "valid", "test", "predict"))
 
 trainer:
   name: registered_trainer()
@@ -49,15 +49,15 @@ logger:
 
 learner:
   name: registered_learner()
-  params: 
+  params: include('params')
   model: include('model')
-  optimizer: 
+  optimizer:
     name: registered_optimizer()
     params: include('params')
-  lr_scheduler: 
+  lr_scheduler:
     name: registered_scheduler()
     params: include('params')
-  critireon: 
+  critireon:
     name: registered_critireon()
     params: include('params')
 
