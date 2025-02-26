@@ -1,5 +1,4 @@
 import pytorch_lightning as pl
-from pydantic import validate_call
 
 from dl_cm.common import DLCM
 from dl_cm.common.datasets import BaseDataset, DatasetFactory
@@ -26,14 +25,17 @@ class FlaggedNamedEntity(namedEntitySchema):
 
 
 class BaseDataModule(pl.LightningDataModule, DLCM):
-    @validate_call
+    @staticmethod
+    def registry() -> Registry:
+        return DATAMODULES_REGISTERY
+
     def __init__(
         self,
         datasets: list[BaseDataset | namedEntitySchema],
         dataloaders: dict[str, namedEntitySchema | BaseDataloader],
+        preprocessing: FlaggedNamedEntity,
+        augmentation: FlaggedNamedEntity,
         common_dataloader_params: dict = {},
-        preprocessing=FlaggedNamedEntity(),
-        augmentation=FlaggedNamedEntity(),
     ):
         super().__init__()
         # Datasets loading

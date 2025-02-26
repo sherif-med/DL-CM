@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
-from dl_cm.common.learning import LearnersFactory
-from dl_cm.common.learning.base_learner import BaseLearner
+from dl_cm.common.learning import BaseLearner, LearnersFactory
 from dl_cm.common.typing import StepInputStruct, StepOutputStruct, namedEntitySchema
 
 

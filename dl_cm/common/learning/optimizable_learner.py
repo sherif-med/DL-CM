@@ -1,4 +1,4 @@
-from dl_cm.common.learning.base_learner import BaseLearner
+from dl_cm.common.learning import BaseLearner
 from dl_cm.common.tasks.optimizer import (
     BaseLrScheduler,
     BaseOptimizer,
