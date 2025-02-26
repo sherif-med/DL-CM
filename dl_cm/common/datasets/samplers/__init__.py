@@ -1,32 +1,30 @@
-from dl_cm.utils.registery import Registry
-from dl_cm.utils.ppattern.factory import BaseFactory
-from dl_cm.common import DLCM
-from dl_cm.utils.ppattern.data_validation import validationMixin
-import pydantic as pd
-from dl_cm.common.typing import namedEntitySchema
 import torch
+import torch.utils.data.sampler
+
+from dl_cm.common import DLCM
+from dl_cm.utils.ppattern.factory import BaseFactory
+from dl_cm.utils.registery import Registry
 
 SAMPLER_REGISTRY = Registry("Samplers")
-class BaseSampler(torch.utils.data.Sampler, DLCM, validationMixin):
 
+
+class BaseSampler(DLCM):
     @staticmethod
-    def config_schema()-> pd.BaseModel:
-        return namedEntitySchema
+    def registry() -> Registry:
+        return SAMPLER_REGISTRY
 
-    def __init__(self, config):
-        validationMixin.__init__(self, config)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 
 class SamplersFactory(BaseFactory[BaseSampler]):
-    
     @staticmethod
-    def base_class()-> type[BaseSampler]:
+    def base_class() -> type[BaseSampler]:
         return BaseSampler
 
-from functools import partial
-base_sampler_adapter = partial(DLCM.base_class_adapter, base_cls=BaseSampler)
 
-for cls in torch.utils.data.__dict__.values():
+# Register all samplers
+for name in dir(torch.utils.data.sampler):
+    cls = getattr(torch.utils.data.sampler, name)
     if isinstance(cls, type) and issubclass(cls, torch.utils.data.Sampler):
-        SAMPLER_REGISTRY.register(cls, base_class_adapter=base_sampler_adapter)
-
-from . import hetero_dataset_batch_sampler 
+        _ = DLCM.base_class_adapter(cls, base_cls=BaseSampler)
