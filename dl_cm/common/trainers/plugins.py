@@ -20,13 +20,9 @@ class PluginsFactory(BaseFactory[BasePlugin]):
         return BasePlugin
 
 
-from functools import partial
-
 import pytorch_lightning.plugins as pl_plugins
-
-base_plugin_adapter = partial(DLCM.base_class_adapter, base_cls=BasePlugin)
 
 for name in dir(pl_plugins):
     attr = getattr(pl_plugins, name)
     if isinstance(attr, type) and attr.__module__ == pl_plugins.__name__:
-        PLUGINS_REGISTERY.register(attr, base_class_adapter=base_plugin_adapter)
+        _ = DLCM.base_class_adapter(attr, base_cls=BasePlugin)

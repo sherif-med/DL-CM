@@ -20,17 +20,9 @@ class LoggersFactory(BaseFactory[BaseLogger]):
         return BaseLogger
 
 
-from functools import partial
-
-base_logger_adapter = partial(DLCM.base_class_adapter, base_cls=BaseLogger)
-
 import pytorch_lightning.loggers as pl_loggers
 
 for name in dir(pl_loggers):
     attr = getattr(pl_loggers, name)
-    if (
-        isinstance(attr, type)
-        and issubclass(attr, pl_loggers.Logger)
-        and attr.__module__ == pl_loggers.__name__
-    ):
-        LOGGERS_REGISTERY.register(attr, base_class_adapter=base_logger_adapter)
+    if isinstance(attr, type) and issubclass(attr, pl_loggers.Logger):
+        _ = DLCM.base_class_adapter(attr, base_cls=BaseLogger)
