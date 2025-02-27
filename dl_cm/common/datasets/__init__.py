@@ -1,6 +1,7 @@
 import copy
 from abc import ABC, abstractmethod
 from collections import defaultdict
+from functools import cached_property
 from typing import Generic, Type, TypeVar
 
 from pydantic import ConfigDict, validate_call
@@ -76,9 +77,12 @@ class DatasetFactory(BaseFactory[BaseDataset]):
 
 
 COMPOSED_DATASET_CLASS = TypeVar("COMPOSED_DATASET_CLASS", bound=BaseDataset)
+TOP_DATASET_CLASS = TypeVar("TOP_DATASET_CLASS", bound=BaseDataset)
 
 
-class CompositionDataset(BaseDataset, ABC, Generic[COMPOSED_DATASET_CLASS]):
+class CompositionDataset(
+    BaseDataset, ABC, Generic[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]
+):
     @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
     def __init__(
         self,
@@ -131,7 +135,8 @@ class CompositionDataset(BaseDataset, ABC, Generic[COMPOSED_DATASET_CLASS]):
         else:
             return self.parent_dataset.top_parent_index(self.parent_index(index))
 
-    def get_top_dataset(self):
+    @cached_property
+    def top_dataset(self) -> TOP_DATASET_CLASS:
         """
         Recursively retrieve the top-level parent dataset.
 
@@ -141,7 +146,14 @@ class CompositionDataset(BaseDataset, ABC, Generic[COMPOSED_DATASET_CLASS]):
         if not isinstance(self.parent_dataset, CompositionDataset):
             return self.parent_dataset
         else:
-            return self.parent_dataset.get_top_dataset()
+            return self.parent_dataset.top_dataset
+
+
+class IdentityCompositionDataset(
+    CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]
+):
+    def parent_index(self, index: int) -> int:
+        return index
 
 
 from .augmented_dataset import AugmentedDataset
@@ -165,4 +177,5 @@ __all__ = [
     "SplitDataset",
     "SubDataset",
     "UniqueItemsDataset",
+    "IdentityCompositionDataset",
 ]
