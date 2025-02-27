@@ -75,7 +75,7 @@ class DatasetFactory(BaseFactory[BaseDataset]):
         return BaseDataset
 
 
-COMPOSED_DATASET_CLASS = TypeVar("COMPOSED_CLASS", bound=BaseDataset)
+COMPOSED_DATASET_CLASS = TypeVar("COMPOSED_DATASET_CLASS", bound=BaseDataset)
 
 
 class CompositionDataset(BaseDataset, ABC, Generic[COMPOSED_DATASET_CLASS]):
@@ -142,3 +142,27 @@ class CompositionDataset(BaseDataset, ABC, Generic[COMPOSED_DATASET_CLASS]):
             return self.parent_dataset
         else:
             return self.parent_dataset.get_top_dataset()
+
+
+from .augmented_dataset import AugmentedDataset
+from .filtered_dataset import FilteredItemsDataset
+from .items_dataset import ItemsDataset, UniqueItemsDataset
+from .ordered_dataset import OrderedItemsDataset
+from .preprocessed_dataset import PreprocessedDataset
+from .shuffled_dataset import ShuffledDataset
+from .split_datasets import SplitDataset
+from .sub_dataset import SubDataset
+
+__all__ = [
+    "AugmentedDataset",
+    "BaseDataset",
+    "CompositionDataset",
+    "FilteredItemsDataset",
+    "ItemsDataset",
+    "OrderedItemsDataset",
+    "PreprocessedDataset",
+    "ShuffledDataset",
+    "SplitDataset",
+    "SubDataset",
+    "UniqueItemsDataset",
+]
