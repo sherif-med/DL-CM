@@ -49,3 +49,13 @@ class TasksFactory(BaseFactory[BaseTask]):
     @staticmethod
     def base_class() -> type[BaseTask]:
         return BaseTask
+
+
+from . import criterion, metrics  # noqa: F401
+
+__all__ = [
+    "BaseTask",
+    "TasksFactory",
+    "criterion",
+    "metrics",
+]

@@ -30,3 +30,30 @@ class LearnersFactory(BaseFactory[BaseLearner]):
     @staticmethod
     def base_class() -> type[BaseLearner]:
         return BaseLearner
+
+
+from .criterion_learner import CriterionLearner
+from .equivariance_enforced_learner import equivarianceEnforcedLearner
+from .extra_learners import MultiLearner, SequentialLearner, learnerWrapper
+from .optimizable_learner import OptimizableLearner
+from .supervised_learner import SupervisedLearner
+from .test_learners import (
+    SegmentationEquivarianceEnforcedLearner,
+    acrossDimensionVarianceLoss,
+)
+from .unsupervised_learner import UnsupervisedLearner
+
+__all__ = [
+    "BaseLearner",
+    "CriterionLearner",
+    "LearnersFactory",
+    "OptimizableLearner",
+    "SupervisedLearner",
+    "UnsupervisedLearner",
+    "learnerWrapper",
+    "MultiLearner",
+    "SequentialLearner",
+    "equivarianceEnforcedLearner",
+    "SegmentationEquivarianceEnforcedLearner",
+    "acrossDimensionVarianceLoss",
+]

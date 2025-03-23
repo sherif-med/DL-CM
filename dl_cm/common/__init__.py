@@ -24,3 +24,10 @@ class DLCM(registeredClassMixin):
                 base_cls.__init__(self, *args, **kwargs)
 
         return WrappedClass
+
+
+from .datasets import *
+from .learning import *
+from .models import *
+from .tasks import *
+from .trainers import *
