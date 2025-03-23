@@ -1,7 +1,11 @@
 from typing import Callable, Type
 
 from dl_cm.common import DLCM
-from dl_cm.common.datasets import COMPOSED_DATASET_CLASS, CompositionDataset
+from dl_cm.common.datasets import (
+    COMPOSED_DATASET_CLASS,
+    TOP_DATASET_CLASS,
+    CompositionDataset,
+)
 from dl_cm.utils.ppattern.factory import BaseFactory
 from dl_cm.utils.registery import Registry
 
@@ -29,7 +33,9 @@ class PreprocessingId(BasePreprocessing):
         return item
 
 
-class PreprocessedDataset(CompositionDataset[COMPOSED_DATASET_CLASS]):
+class PreprocessedDataset(
+    CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]
+):
     def __init__(self, preprocessing_fn: str | Callable = "id", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.preprocessing_callable = PreprocessingFactory.create(preprocessing_fn)

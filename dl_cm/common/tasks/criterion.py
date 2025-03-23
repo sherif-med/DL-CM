@@ -141,9 +141,3 @@ for name in dir(nn.modules.loss):
         CRITIREON_REGISTRY.register(
             obj=attr, name=name, base_class_adapter=base_loss_adapter
         )
-
-from segmentation_models_pytorch.losses import DiceLoss
-
-CRITIREON_REGISTRY.register(
-    obj=DiceLoss, name="DiceLoss", base_class_adapter=base_loss_adapter
-)

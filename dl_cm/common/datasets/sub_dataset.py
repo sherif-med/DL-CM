@@ -6,13 +6,14 @@ import numpy as np
 from dl_cm import _logger as logger
 from dl_cm.common.datasets import (
     COMPOSED_DATASET_CLASS,
+    TOP_DATASET_CLASS,
     BaseDataset,
     CompositionDataset,
 )
 from dl_cm.common.typing import namedEntitySchema
 
 
-class SubDataset(CompositionDataset[COMPOSED_DATASET_CLASS]):
+class SubDataset(CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]):
     def __init__(
         self,
         parent_dataset: BaseDataset | namedEntitySchema,

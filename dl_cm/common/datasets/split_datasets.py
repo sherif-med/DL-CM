@@ -10,10 +10,10 @@ from dl_cm.common.datasets import BaseDataset
 from dl_cm.common.datasets.items_dataset import ItemsDataset
 from dl_cm.common.datasets.sub_dataset import SubDataset
 
-from . import COMPOSED_DATASET_CLASS, CompositionDataset
+from . import COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS, CompositionDataset
 
 
-class SplitDataset(CompositionDataset[COMPOSED_DATASET_CLASS]):
+class SplitDataset(CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]):
     @staticmethod
     def config_schema() -> pd.BaseModel:
         class ValidConfig(pd.BaseModel):

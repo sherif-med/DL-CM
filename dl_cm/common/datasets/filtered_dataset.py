@@ -1,10 +1,16 @@
 from typing import Callable
 
-from dl_cm.common.datasets import COMPOSED_DATASET_CLASS, CompositionDataset
+from dl_cm.common.datasets import (
+    COMPOSED_DATASET_CLASS,
+    TOP_DATASET_CLASS,
+    CompositionDataset,
+)
 from dl_cm.common.functions import FunctionsFactory
 
 
-class FilteredItemsDataset(CompositionDataset[COMPOSED_DATASET_CLASS]):
+class FilteredItemsDataset(
+    CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]
+):
     def __init__(self, filter_fn: str | Callable, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not self.is_in_memory:

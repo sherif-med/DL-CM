@@ -39,11 +39,14 @@ from dl_cm.common.datasets.datamodule import DATAMODULES_REGISTERY
 from dl_cm.common.datasets.preprocessed_dataset import PREPROCESSING_REGISTERY
 from dl_cm.common.datasets.transformations import TRANSFORMATION_REGISTRY
 from dl_cm.common.learning import LEARNERS_REGISTERY
+from dl_cm.common.learning.optimizable_learner import (
+    LR_SCHEDULER_REGiSTERY,
+    OPTIMIZER_REGiSTERY,
+)
 from dl_cm.common.models import MODELS_REGISTERY
 from dl_cm.common.tasks import TASKS_REGISTERY
 from dl_cm.common.tasks.criterion import CRITIREON_REGISTRY
 from dl_cm.common.tasks.metrics import METRICS_REGISTRY
-from dl_cm.common.tasks.optimizer import LR_SCHEDULER_REGiSTERY, OPTIMIZER_REGiSTERY
 from dl_cm.common.trainers.base_trainer import TRAINERS_REGISTERY
 from dl_cm.common.trainers.callbacks import CALLBACKS_REGISTERY
 from dl_cm.common.trainers.loggers import LOGGERS_REGISTERY

@@ -2,7 +2,11 @@ import collections
 import collections.abc
 from typing import Any, Callable
 
-from dl_cm.common.datasets import COMPOSED_DATASET_CLASS, DatasetFactory
+from dl_cm.common.datasets import (
+    COMPOSED_DATASET_CLASS,
+    TOP_DATASET_CLASS,
+    DatasetFactory,
+)
 from dl_cm.common.datasets.sub_dataset import SubDataset
 from dl_cm.common.functions import FunctionsFactory
 from dl_cm.common.typing import OneOrMany, namedEntitySchema
@@ -32,7 +36,7 @@ class ItemsDataset(BaseDataset):
         return self._items_list[index]
 
 
-class UniqueItemsDataset(SubDataset[COMPOSED_DATASET_CLASS]):
+class UniqueItemsDataset(SubDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]):
     """
     A dataset class that ensures all items within the dataset are unique based on a specified hash function.
 

@@ -1,4 +1,4 @@
-from dl_cm.common.datasets import COMPOSED_DATASET_CLASS
+from dl_cm.common.datasets import COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS
 from dl_cm.common.datasets.transformations.general_transformation import (
     GeneralRevrsibleTransformation,
 )
@@ -25,7 +25,7 @@ class TransIdentity(GeneralRevrsibleTransformation):
         )
 
 
-class AugmentedDataset(CompositionDataset[COMPOSED_DATASET_CLASS]):
+class AugmentedDataset(CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]):
     def __init__(
         self, augmentations: list[str | GeneralTransformation], *args, **kwargs
     ):

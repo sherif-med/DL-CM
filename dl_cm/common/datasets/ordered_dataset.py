@@ -1,10 +1,16 @@
 from typing import Callable
 
-from dl_cm.common.datasets import COMPOSED_DATASET_CLASS, CompositionDataset
+from dl_cm.common.datasets import (
+    COMPOSED_DATASET_CLASS,
+    TOP_DATASET_CLASS,
+    CompositionDataset,
+)
 from dl_cm.common.functions import FunctionsFactory
 
 
-class OrderedItemsDataset(CompositionDataset[COMPOSED_DATASET_CLASS]):
+class OrderedItemsDataset(
+    CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]
+):
     def __init__(self, order_fn: str | Callable, *args, **kwargs):
         super().__init__(*args, **kwargs)
         element_to_value = FunctionsFactory.create(order_fn)

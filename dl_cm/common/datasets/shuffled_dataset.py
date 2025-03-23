@@ -3,10 +3,14 @@ import collections.abc
 
 import numpy as np
 
-from dl_cm.common.datasets import COMPOSED_DATASET_CLASS, CompositionDataset
+from dl_cm.common.datasets import (
+    COMPOSED_DATASET_CLASS,
+    TOP_DATASET_CLASS,
+    CompositionDataset,
+)
 
 
-class ShuffledDataset(CompositionDataset[COMPOSED_DATASET_CLASS]):
+class ShuffledDataset(CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]):
     def __init__(
         self,
         shuffled_indices: collections.abc.Iterable[int] | np.ndarray = None,
