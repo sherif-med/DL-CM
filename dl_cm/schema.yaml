@@ -9,65 +9,68 @@ datamodule:
     preprocessing:
       apply: bool(required=False)
       name: registered_preprocessing(required=False)
-      params: include('params')
+      params: map(any(), required=False)
     augmentation:
       apply: bool(required=False)
       augmentations: list(include('named_entity'))
     datasets: list(include('dataset'))
     common_loaders_params: map(key=str(), required=False)
     dataloaders: map(include('dataloader'), key=enum("train", "valid", "test", "predict"))
+    extra: map(any(), required=False)
 
 trainer:
   name: registered_trainer()
-  params: include('params')
+  params: map(any(), required=False)
   callbacks: list(include('callback'))
   loggers: list(include('logger'))
 
 task:
   name: registered_task()
-  learner: include('learner')
+  params:
+    learner: include('learner')
 
 # Define reusable components
 ---
 dataset:
   name: registered_dataset()
   reference_name: str(required=False)
-  params: include('params')
+  params: map(any(), required=False)
 
 dataloader:
   name: str()
-  respective_dataset_name: str()
-  params: include('params')
+  dataset_reference_name: str()
+  params: map(any(), required=False)
 
 callback:
   name: registered_callback()
-  params: include('params')
+  params: map(any(), required=False)
 
 logger:
   name: registered_logger()
-  params: include('params')
+  params: map(any(), required=False)
 
 learner:
   name: registered_learner()
-  params: include('params')
+  params: map(any(), required=False)
   model: include('model')
-  optimizer:
-    name: registered_optimizer()
-    params: include('params')
-  lr_scheduler:
-    name: registered_scheduler()
-    params: include('params')
+  optimizer: include("optimizer")
+  lr_scheduler: include("lr_scheduler", required=False)
   critireon:
     name: registered_critireon()
-    params: include('params')
+    params: map(any(), required=False)
+
+optimizer:
+  name: registered_optimizer()
+  params: map(any(), required=False)
+
+lr_scheduler:
+  name: registered_scheduler()
+  params: map(any(), required=False)
 
 model:
   name: registered_model()
-  params: include('params')
-
-params:  # Reusable component for params
-  map(any(), required=False)
+  params: map(any(), required=False)
 
 named_entity:
   name: str()
-  params: include('params')
+  params: map(any(), required=False)
