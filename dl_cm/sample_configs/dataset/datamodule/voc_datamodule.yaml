@@ -1,0 +1,47 @@
+name: BaseDataModule
+params:
+  preprocessing: # applied to all datasets
+    apply: True
+    name: VocPreprocessing
+    params:
+      name: id
+  augmentation: # applied to all datasets
+    apply: True
+    augmentations:
+      - name: VocTransFlipud
+      - name: VocTransFliplr
+      - name: VocTransRot270
+      - name: VocTransRot180
+  extra:
+    data_ignore_index: &data_ignore_index 255
+
+  datasets:
+    - name : SplitDataset
+      params:
+        reference_names: ["train","valid"]
+        split_ratios: [0.8, 0.2]
+        parent_dataset:
+          name: VocDataset
+          params:
+            root_dir: E:/Documents/DATA/VOC2012_train_val/
+
+  common_loaders_params:
+    num_workers: 6
+    batch_size: 6
+    shuffle: False
+    drop_last: False
+    collate_fn: null
+
+  dataloaders:
+    train:
+      name: DataLoader
+      dataset_reference_name: train
+      params:
+        shuffle: True
+        drop_last: True
+    valid:
+      name: DataLoader
+      dataset_reference_name: valid
+      params:
+        shuffle: False
+        drop_last: True

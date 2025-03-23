@@ -1,0 +1,48 @@
+## Experiments section
+### Mainly for paths to use for experiments like logging path and checpointing
+
+experiment_name: &ex_name Experiment1
+experiment_checkpoint_directory: &ex_ck_dir ./Trials/Ex1/checkpoints/
+experiment_logging_directory: &ex_log_dir ./Trials/Ex1/tensorboard_logs/
+
+datamodule: !include ../dataset/datamodule/voc_datamodule.yaml
+
+task:
+  name: BaseTask
+  params:
+    learner: !include ../learning/auxiliary/SemanticSegmentationLearner.yaml
+
+trainer:
+  name: BaseTrainer
+  params:
+    accelerator: gpu
+    max_epochs: 100
+    enable_progress_bar: True
+  callbacks:
+
+    - name: metricTrackCallback
+      params:
+        metrics:
+          - name: F1Score
+          - name: JacardIndex
+
+    - name: MetricsLoggingCallback
+
+    - name: ModelCheckpoint
+      params:
+        monitor: valid_F1Score
+        dirpath: *ex_ck_dir
+        filename: "ckpt-{epoch:02d}-{valid_F1Score:.2f}"
+        save_top_k: 2
+        mode: max
+        save_weights_only: False
+
+    - name: TQDMProgressBar
+      params:
+        refresh_rate: 10
+
+  loggers:
+    - name: TensorBoardLogger
+      params:
+        save_dir: *ex_log_dir
+        name: *ex_name
