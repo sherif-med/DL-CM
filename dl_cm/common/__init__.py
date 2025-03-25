@@ -20,14 +20,12 @@ class DLCM(registeredClassMixin):
 
         class WrappedClass(external_cls, base_cls, wrapped_name=external_cls.__name__):
             def __init__(self, *args, **kwargs):
-                external_cls.__init__(*args, **kwargs.pop("params", {}))
+                external_cls.__init__(self, *args, **kwargs)
                 base_cls.__init__(self, *args, **kwargs)
 
         return WrappedClass
 
 
-from .datasets import *
-from .learning import *
-from .models import *
-from .tasks import *
-from .trainers import *
+from . import data, learning, models, tasks, trainers
+
+__all__ = ["data", "learning", "models", "tasks", "trainers"]
