@@ -7,7 +7,7 @@ from dl_cm.common.learning.criterion_learner import CriterionLearner
 from dl_cm.common.tasks import BaseTask
 from dl_cm.common.tasks.criterion import BaseLoss
 from dl_cm.common.tasks.metrics import BaseMetric, MetricsFactory
-from dl_cm.common.trainers.callbacks import baseCallback
+from dl_cm.common.trainer.callbacks import baseCallback
 from dl_cm.common.typing import StepOutputStruct, namedEntitySchema
 
 

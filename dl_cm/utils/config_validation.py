@@ -46,9 +46,8 @@ from dl_cm.common.models import MODELS_REGISTERY
 from dl_cm.common.tasks import TASKS_REGISTERY
 from dl_cm.common.tasks.criterion import CRITIREON_REGISTRY
 from dl_cm.common.tasks.metrics import METRICS_REGISTRY
-from dl_cm.common.trainers.base_trainer import TRAINERS_REGISTERY
-from dl_cm.common.trainers.callbacks import CALLBACKS_REGISTERY
-from dl_cm.common.trainers.loggers import LOGGERS_REGISTERY
+from dl_cm.common.trainer.callbacks import CALLBACKS_REGISTERY
+from dl_cm.common.trainer.loggers import LOGGERS_REGISTERY
 from dl_cm.config_loaders import open_config_file
 
 
@@ -82,7 +81,6 @@ _registries_validators = {
     "registered_model": MODELS_REGISTERY,
     "registered_learner": LEARNERS_REGISTERY,
     "registered_datamodule": DATAMODULES_REGISTERY,
-    "registered_trainer": TRAINERS_REGISTERY,
 }
 
 _extended_validators = DefaultValidators.copy()

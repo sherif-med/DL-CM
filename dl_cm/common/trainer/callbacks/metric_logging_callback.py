@@ -3,8 +3,8 @@ import pytorch_lightning as pl
 
 from dl_cm import _logger as logger
 from dl_cm.common.tasks import BaseTask
-from dl_cm.common.trainers.callbacks import baseCallback
-from dl_cm.common.trainers.callbacks.metric_track_callback import metricTrackCallback
+from dl_cm.common.trainer.callbacks import baseCallback
+from dl_cm.common.trainer.callbacks.metric_track_callback import metricTrackCallback
 from dl_cm.common.typing import StepOutputStruct
 
 

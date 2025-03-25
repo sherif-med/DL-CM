@@ -1,8 +1,8 @@
 import pytorch_lightning as pl
 
-from dl_cm.common.trainers.callbacks import CallbacksFactory, baseCallback
-from dl_cm.common.trainers.loggers import BaseLogger, LoggersFactory
-from dl_cm.common.trainers.plugins import BasePlugin, PluginsFactory
+from dl_cm.common.trainer.callbacks import CallbacksFactory, baseCallback
+from dl_cm.common.trainer.loggers import BaseLogger, LoggersFactory
+from dl_cm.common.trainer.plugins import BasePlugin, PluginsFactory
 from dl_cm.common.typing import namedEntitySchema
 
 

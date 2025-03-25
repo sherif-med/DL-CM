@@ -26,6 +26,6 @@ class DLCM(registeredClassMixin):
         return WrappedClass
 
 
-from . import data, learning, models, tasks, trainers
+from . import data, learning, models, tasks, trainer
 
-__all__ = ["data", "learning", "models", "tasks", "trainers"]
+__all__ = ["data", "learning", "models", "tasks", "trainer"]
