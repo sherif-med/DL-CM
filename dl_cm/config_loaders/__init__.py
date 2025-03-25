@@ -4,6 +4,9 @@ from pathlib import Path
 import torch
 import yaml
 
+from dl_cm.common.typing import namedEntitySchema
+from dl_cm.utils.registery import Registry
+
 
 # Define a custom constructor for the `!tensor` tag
 def tensor_constructor(loader, node):
@@ -56,9 +59,7 @@ def open_config_file(conf_file_path: str) -> dict:
         return config
 
 
-def load_named_entity(registry, entity_config):
-    entity_cls = registry.get(entity_config.get("name"))
-    entity_params = entity_config.get("params")
-    if entity_params is None:
-        entity_params = {}
+def load_named_entity(registry: Registry, entity_config: namedEntitySchema):
+    entity_cls = registry.get(entity_config.name)
+    entity_params = entity_config.params
     return entity_cls(**entity_params)
