@@ -11,6 +11,7 @@ import collections.abc
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
+from dl_cm.common.typing import namedEntitySchema
 from dl_cm.config_loaders import load_named_entity
 from dl_cm.utils.exceptions import OutOfTypesException
 from dl_cm.utils.registery import Registry, registeredClassMixin
@@ -51,17 +52,19 @@ class BaseFactory(Generic[T], ABC):
         """
 
     @classmethod
-    def create(cls, param: str | dict | T | collections.abc.Iterable[T]) -> T | list[T]:
+    def create(
+        cls, param: str | namedEntitySchema | T | collections.abc.Sequence[T]
+    ) -> T | list[T]:
         """
         Create an instance of the class, or a list of instances from the parameters.
 
         Parameters
         ----------
-        param : str, dict, cls.base_class(), collections.abc.Iterable
+        param : str, dict, cls.base_class(), collections.abc.Sequence
             Parameters to create the instance. If str, it is the name of the class to create.
-            If dict, it is the configuration for the class to create.
+            If namedEntitySchema, it is the configuration for the class to create.
             If cls.base_class(), it is the instance to return.
-            If collections.abc.Iterable, it is a list of parameters to create a list of instances.
+            If collections.abc.Sequence, it is a list of parameters to create a list of instances.
 
         Returns
         -------
@@ -79,18 +82,16 @@ class BaseFactory(Generic[T], ABC):
         if isinstance(param, str):
             dataset_class = cls.registry().get(param)
             return dataset_class()
-        elif isinstance(param, dict):
+        elif isinstance(param, namedEntitySchema):
             return load_named_entity(cls.registry(), param)
+        elif isinstance(param, dict):
+            return load_named_entity(cls.registry(), namedEntitySchema(**param))
         elif isinstance(param, cls.base_class()):
             return param
-        elif isinstance(param, collections.abc.Iterable):
+        elif isinstance(param, collections.abc.Sequence):
             return type(param)(cls.create(p) for p in param)
         else:
             raise OutOfTypesException(
                 param,
-                (
-                    str,
-                    dict,
-                    cls.base_class(),
-                ),
+                (str, namedEntitySchema, cls.base_class(), collections.abc.Sequence),
             )
