@@ -1,7 +1,7 @@
 import torch
 
-from dl_cm.common.datasets import LOADED_DATASETS_REGISTRY
-from dl_cm.common.datasets.samplers import SamplersFactory
+from dl_cm.common.data.datasets import LOADED_DATASETS_REGISTRY
+from dl_cm.common.data.samplers import SamplersFactory
 from dl_cm.common.functions import FunctionsFactory
 from dl_cm.utils.ppattern.factory import BaseFactory
 from dl_cm.utils.registery import Registry

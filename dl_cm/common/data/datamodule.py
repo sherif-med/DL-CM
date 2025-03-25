@@ -1,9 +1,11 @@
 import pytorch_lightning as pl
 
 from dl_cm.common import DLCM
-from dl_cm.common.datasets import BaseDataset, DatasetFactory
-from dl_cm.common.datasets.augmented_dataset import (
-    AugmentedDataset,
+from dl_cm.common.data.base_dataloader import BaseDataloader, DataloadersFactory
+from dl_cm.common.data.datasets import BaseDataset, DatasetFactory
+from dl_cm.common.data.datasets.augmented_dataset import AugmentedDataset
+from dl_cm.common.data.datasets.preprocessed_dataset import PreprocessedDataset
+from dl_cm.common.data.transformations.general_transformation import (
     GeneralTransformation,
     GeneralTransformationFactory,
 )

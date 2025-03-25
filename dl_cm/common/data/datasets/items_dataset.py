@@ -2,12 +2,12 @@ import collections
 import collections.abc
 from typing import Any, Callable
 
-from dl_cm.common.datasets import (
+from dl_cm.common.data.datasets import (
     COMPOSED_DATASET_CLASS,
     TOP_DATASET_CLASS,
     DatasetFactory,
 )
-from dl_cm.common.datasets.sub_dataset import SubDataset
+from dl_cm.common.data.datasets.sub_dataset import SubDataset
 from dl_cm.common.functions import FunctionsFactory
 from dl_cm.common.typing import OneOrMany, namedEntitySchema
 from dl_cm.utils.exceptions import OutOfTypesException

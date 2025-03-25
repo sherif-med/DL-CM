@@ -3,7 +3,7 @@ import collections.abc
 
 import numpy as np
 
-from dl_cm.common.datasets import (
+from dl_cm.common.data.datasets import (
     COMPOSED_DATASET_CLASS,
     TOP_DATASET_CLASS,
     CompositionDataset,

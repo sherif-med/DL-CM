@@ -1,14 +1,12 @@
-from dl_cm.common.datasets import COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS
-from dl_cm.common.datasets.transformations.general_transformation import (
+from dl_cm.common.data.datasets import COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS
+from dl_cm.common.data.transformations import TRANSFORMATION_REGISTRY
+from dl_cm.common.data.transformations.general_transformation import (
     GeneralRevrsibleTransformation,
-)
-
-from . import CompositionDataset
-from .transformations import TRANSFORMATION_REGISTRY
-from .transformations.general_transformation import (
     GeneralTransformation,
     GeneralTransformationFactory,
 )
+
+from . import CompositionDataset
 
 
 @TRANSFORMATION_REGISTRY.register(name="id")

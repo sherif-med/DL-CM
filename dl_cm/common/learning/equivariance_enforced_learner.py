@@ -1,4 +1,4 @@
-from dl_cm.common.datasets.transformations.general_transformation import (
+from dl_cm.common.data.transformations.general_transformation import (
     GeneralRevrsibleTransformation,
     GeneralTransformation,
     GeneralTransformationFactory,

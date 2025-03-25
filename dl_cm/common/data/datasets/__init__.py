@@ -65,7 +65,7 @@ class BaseDataset(DLCM):
         Returns:
             An instance of the composition class with the current dataset as the parent dataset
         """
-        return composition_cls[COMPOSITION_DATASET_CLASS](
+        return composition_cls[COMPOSITION_DATASET_CLASS, TOP_DATASET_CLASS](
             parent_dataset=self, copy_parent=False, *args, **kwargs
         )
 

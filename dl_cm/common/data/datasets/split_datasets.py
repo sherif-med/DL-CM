@@ -6,9 +6,9 @@ import collections.abc
 import numpy as np
 import pydantic as pd
 
-from dl_cm.common.datasets import BaseDataset
-from dl_cm.common.datasets.items_dataset import ItemsDataset
-from dl_cm.common.datasets.sub_dataset import SubDataset
+from dl_cm.common.data.datasets import BaseDataset
+from dl_cm.common.data.datasets.items_dataset import ItemsDataset
+from dl_cm.common.data.datasets.sub_dataset import SubDataset
 
 from . import COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS, CompositionDataset
 

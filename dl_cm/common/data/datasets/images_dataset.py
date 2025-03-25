@@ -7,9 +7,13 @@ import torch
 from pydantic import DirectoryPath, validate_call
 from skimage.io import imread
 
-from dl_cm.common.datasets import COMPOSED_DATASET_CLASS, CompositionDataset
-from dl_cm.common.datasets.filtered_dataset import FilteredItemsDataset
-from dl_cm.common.datasets.items_dataset import ItemsDataset
+from dl_cm.common.data.datasets import (
+    COMPOSED_DATASET_CLASS,
+    TOP_DATASET_CLASS,
+    CompositionDataset,
+)
+from dl_cm.common.data.datasets.filtered_dataset import FilteredItemsDataset
+from dl_cm.common.data.datasets.items_dataset import ItemsDataset
 
 
 class FilesWithinDirectoryDataset(ItemsDataset):
@@ -23,7 +27,9 @@ DEFAULT_IMAGES_EXTENSIONS = tuple([".tif", ".jpeg", ".png", "jpg"])
 IMAGE_KEY = "image"
 
 
-class ImagesWithinDirectoryDataset(CompositionDataset[COMPOSED_DATASET_CLASS]):
+class ImagesWithinDirectoryDataset(
+    CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]
+):
     def __init__(
         self,
         directory_path: DirectoryPath,

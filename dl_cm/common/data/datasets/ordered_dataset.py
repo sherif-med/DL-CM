@@ -1,6 +1,6 @@
 from typing import Callable
 
-from dl_cm.common.datasets import (
+from dl_cm.common.data.datasets import (
     COMPOSED_DATASET_CLASS,
     TOP_DATASET_CLASS,
     CompositionDataset,
@@ -24,3 +24,6 @@ class OrderedItemsDataset(
 
     def __getitem__(self, index):
         return self.parent_dataset[self.reordered_items_indices[index]]
+
+    def parent_index(self, index):
+        return self.reordered_items_indices[index]
