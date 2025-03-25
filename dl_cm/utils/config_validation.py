@@ -34,10 +34,9 @@ from yamale.validators import DefaultValidators, Validator
 
 from dl_cm import DEFAULT_SCHEMA_PATH
 from dl_cm import _logger as logger
-from dl_cm.common.datasets import DATASETS_REGISTERY
-from dl_cm.common.datasets.datamodule import DATAMODULES_REGISTERY
-from dl_cm.common.datasets.preprocessed_dataset import PREPROCESSING_REGISTERY
-from dl_cm.common.datasets.transformations import TRANSFORMATION_REGISTRY
+from dl_cm.common.data.datamodule import DATAMODULES_REGISTERY
+from dl_cm.common.data.datasets import DATASETS_REGISTERY
+from dl_cm.common.data.transformations import TRANSFORMATION_REGISTRY
 from dl_cm.common.learning import LEARNERS_REGISTERY
 from dl_cm.common.learning.optimizable_learner import (
     LR_SCHEDULER_REGiSTERY,
@@ -75,7 +74,7 @@ _registries_validators = {
     "registered_dataset": DATASETS_REGISTERY,
     "registered_callback": CALLBACKS_REGISTERY,
     "registered_optimizer": OPTIMIZER_REGiSTERY,
-    "registered_preprocessing": PREPROCESSING_REGISTERY,
+    "registered_transformation": TRANSFORMATION_REGISTRY,
     "registered_augtrans": TRANSFORMATION_REGISTRY,
     "registered_critireon": CRITIREON_REGISTRY,
     "registered_metric": METRICS_REGISTRY,

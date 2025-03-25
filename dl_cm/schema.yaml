@@ -8,7 +8,7 @@ datamodule:
   params:
     preprocessing:
       apply: bool(required=False)
-      name: registered_preprocessing(required=False)
+      name: registered_transformation(required=False)
       params: map(any(), required=False)
     augmentation:
       apply: bool(required=False)
