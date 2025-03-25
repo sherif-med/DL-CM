@@ -14,7 +14,7 @@ datamodule:
       apply: bool(required=False)
       augmentations: list(include('named_entity'))
     datasets: list(include('dataset'))
-    common_loaders_params: map(key=str(), required=False)
+    common_dataloader_params: map(key=str(), required=False)
     dataloaders: map(include('dataloader'), key=enum("train", "valid", "test", "predict"))
     extra: map(any(), required=False)
 
@@ -38,7 +38,7 @@ dataset:
 
 dataloader:
   name: str()
-  dataset_reference_name: str()
+  #dataset_reference_name: str()
   params: map(any(), required=False)
 
 callback:
@@ -52,12 +52,12 @@ logger:
 learner:
   name: registered_learner()
   params: map(any(), required=False)
-  model: include('model')
-  optimizer: include("optimizer")
-  lr_scheduler: include("lr_scheduler", required=False)
-  critireon:
-    name: registered_critireon()
-    params: map(any(), required=False)
+  #model: include('model')
+  #optimizer: include("optimizer")
+  #lr_scheduler: include("lr_scheduler", required=False)
+  #critireon:
+  #  name: registered_critireon()
+  #  params: map(any(), required=False)
 
 optimizer:
   name: registered_optimizer()
