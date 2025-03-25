@@ -8,6 +8,35 @@ from . import TRANSFORMATION_REGISTRY
 
 
 class GeneralTransformation(DLCM):
+    """
+    A class representing a general transformation.
+
+    This class is designed to apply a forward transformation function to an item.
+    It can be extended or used as a base class for specific transformations like preprocessing.
+
+    Attributes:
+        __fwd__fn__: A callable function that takes items and returns transformed items.
+
+    Methods:
+        __call__(item, **kwargs): Applies the forward transformation function to the given item.
+        registry(): Returns the registry associated with this transformation type.
+    """
+
+    def __init__(self, fwdfn):
+        """
+        Initializes a GeneralTransformation.
+
+        Args:
+            fwdfn: A function that takes some items and returns transformed items.
+        """
+        self.__fwd__fn__ = fwdfn
+
+    def __fwd__(self, *args):
+        return self.__fwd__fn__(*args)
+
+    def __call__(self, item, **kwargs):
+        return self.__fwd__(item, **kwargs)
+
     @staticmethod
     def registry() -> Registry:
         return TRANSFORMATION_REGISTRY

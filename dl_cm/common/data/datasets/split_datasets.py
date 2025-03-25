@@ -51,6 +51,9 @@ class SplitDataset(CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]
     def get_dataset_by_ref_name(self, ref_name: str) -> BaseDataset:
         return self._ref_datasets_map.get(ref_name)
 
+    def parent_index(self, index: int) -> int:
+        raise NotImplementedError()
+
 
 def split_dataset_random(
     parent_dataset: ItemsDataset,
@@ -90,6 +93,6 @@ def split_dataset_random(
             "reference_name": ref_name,
         }
         # Create a new subdataset instance for the current subset of indices
-        subdatasets.append(SubDataset(c_config))
+        subdatasets.append(SubDataset(**c_config))
 
     return subdatasets
