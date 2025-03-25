@@ -15,7 +15,7 @@ task:
 trainer:
   name: BaseTrainer
   params:
-    accelerator: gpu
+    accelerator: cpu
     max_epochs: 100
     enable_progress_bar: True
   callbacks:
@@ -24,7 +24,13 @@ trainer:
       params:
         metrics:
           - name: F1Score
-          - name: JacardIndex
+            params:
+              task: multiclass
+              num_classes: 21
+          - name: JaccardIndex
+            params:
+              task: multiclass
+              num_classes: 21
 
     - name: MetricsLoggingCallback
 
