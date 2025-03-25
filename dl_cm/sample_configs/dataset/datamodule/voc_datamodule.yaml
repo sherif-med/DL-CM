@@ -3,8 +3,6 @@ params:
   preprocessing: # applied to all datasets
     apply: True
     name: VocPreprocessing
-    params:
-      name: id
   augmentation: # applied to all datasets
     apply: True
     augmentations:
@@ -14,6 +12,7 @@ params:
       - name: VocTransRot180
   extra:
     data_ignore_index: &data_ignore_index 255
+    number_of_classes: 21
 
   datasets:
     - name : SplitDataset
@@ -25,7 +24,7 @@ params:
           params:
             root_dir: E:/Documents/DATA/VOC2012_train_val/
 
-  common_loaders_params:
+  common_dataloader_params:
     num_workers: 6
     batch_size: 6
     shuffle: False
@@ -35,13 +34,13 @@ params:
   dataloaders:
     train:
       name: DataLoader
-      dataset_reference_name: train
       params:
+        dataset_reference_name: train
         shuffle: True
         drop_last: True
     valid:
       name: DataLoader
-      dataset_reference_name: valid
       params:
+        dataset_reference_name: valid
         shuffle: False
         drop_last: True
