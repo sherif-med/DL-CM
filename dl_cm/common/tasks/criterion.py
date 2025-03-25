@@ -21,7 +21,7 @@ def base_loss_adapter(loss_cls: type[nn.modules.loss._Loss]):
     class WrappedLoss(loss_cls, BaseLoss):
         def __init__(self, *args, **kwargs):
             """Wraps a loss to extract values from dictionary inputs."""
-            loss_cls.__init__(self, *args, **kwargs.pop("params", {}))
+            loss_cls.__init__(self, *args, **kwargs)
             BaseLoss.__init__(self, *args, **kwargs)
 
         @staticmethod

@@ -1,6 +1,5 @@
 import pydantic as pd
 import pytorch_lightning as pl
-from pydantic import validate_call
 
 from dl_cm import _logger as logger
 from dl_cm.common.tasks import BaseTask
@@ -19,8 +18,8 @@ class namedLogModOptions(logModOptions):
 
 
 class defaulLoggingOptions(pd.BaseModel):
-    train: logModOptions
-    valid: logModOptions
+    train: logModOptions = logModOptions()
+    valid: logModOptions = logModOptions()
 
 
 class LoggingOptions(pd.BaseModel):
@@ -31,10 +30,9 @@ class LoggingOptions(pd.BaseModel):
 class MetricsLoggingCallback(baseCallback):
     metric_track_callback: metricTrackCallback
 
-    @validate_call
     def __init__(
         self,
-        defaults: defaulLoggingOptions,
+        defaults=defaulLoggingOptions(),
         train: list[namedLogModOptions] = None,
         valid: list[namedLogModOptions] = None,
         *args,

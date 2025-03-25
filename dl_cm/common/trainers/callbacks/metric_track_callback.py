@@ -12,14 +12,13 @@ from dl_cm.common.typing import StepOutputStruct, namedEntitySchema
 
 
 class metricTrackCallback(baseCallback):
-    binary_train_metrics: MetricCollection
-    binary_valid_metrics: MetricCollection
-    loss_train_metrics: MetricCollection
-    loss_valid_metrics: MetricCollection
-    task_learner_criterion: BaseLoss
-
     def __init__(self, metrics: list[namedEntitySchema | BaseMetric], *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.binary_train_metrics: MetricCollection = None
+        self.binary_valid_metrics: MetricCollection = None
+        self.loss_train_metrics: MetricCollection = None
+        self.loss_valid_metrics: MetricCollection = None
+        self.task_learner_criterion: BaseLoss = None
         loaded_metrics = MetricsFactory.create(metrics)
         self.extend_binary_metrics(loaded_metrics)
 
