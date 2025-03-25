@@ -34,6 +34,10 @@ class BaseDataloader:
                 params[k] = respective_factory.create(params.get(k))
         return params
 
+    @staticmethod
+    def registry() -> Registry:
+        return DATALOADERS_REGISTRY
+
 
 def base_dataloader_adapter(dataloader_cls: type):
     """Decorator to make any external loss inherit from BaseLoss
@@ -42,11 +46,12 @@ def base_dataloader_adapter(dataloader_cls: type):
 
     class WrappedDataloader(dataloader_cls, BaseDataloader):
         def __init__(self: BaseDataloader, *args, **kwargs):
-            """Wraps a loss to extract values from dictionary inputs."""
+            """Wraps a data loader to pop unused arguments and instantiate params."""
             BaseDataloader.__init__(self, *args, **kwargs)
             kwargs["dataset"] = LOADED_DATASETS_REGISTRY.get(
                 self.dataset_reference_name
             )
+            kwargs.pop("dataset_reference_name")
             # instantiate object params
             kwargs = self.instantiate_params(kwargs)
             dataloader_cls.__init__(self, **kwargs)
