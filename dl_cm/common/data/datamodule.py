@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pytorch_lightning as pl
 
 from dl_cm.common import DLCM
@@ -8,12 +10,6 @@ from dl_cm.common.data.datasets.preprocessed_dataset import PreprocessedDataset
 from dl_cm.common.data.transformations.general_transformation import (
     GeneralTransformation,
     GeneralTransformationFactory,
-)
-from dl_cm.common.datasets.base_dataloader import BaseDataloader, DataloadersFactory
-from dl_cm.common.datasets.preprocessed_dataset import (
-    BasePreprocessing,
-    PreprocessedDataset,
-    PreprocessingFactory,
 )
 from dl_cm.common.typing import namedEntitySchema
 from dl_cm.utils.ppattern.factory import BaseFactory
@@ -35,26 +31,28 @@ class BaseDataModule(pl.LightningDataModule, DLCM):
         self,
         datasets: list[BaseDataset | namedEntitySchema],
         dataloaders: dict[str, namedEntitySchema | BaseDataloader],
-        preprocessing: FlaggedNamedEntity,
-        augmentation: FlaggedNamedEntity,
-        common_dataloader_params: dict = {},
+        preprocessing: dict,
+        augmentation: dict,
+        common_dataloader_params: Optional[dict] = None,
+        extra: Optional[dict] = None,
     ):
         super().__init__()
         # Datasets loading
         self.datasets: list[BaseDataset] = DatasetFactory.create(datasets)
         # Data preprocessing
+        preprocessing = FlaggedNamedEntity(**preprocessing)
         if preprocessing.apply:
-            preprocessing_fn: BasePreprocessing = PreprocessingFactory.create(
-                preprocessing.model_dump()
+            preprocessing_fn: GeneralTransformation = (
+                GeneralTransformationFactory.create(preprocessing)
             )
             self.datasets = [
                 d.compose(PreprocessedDataset, preprocessing_fn=preprocessing_fn)
                 for d in self.datasets
             ]
         # Data augmentation
-        if augmentation.apply:
+        if augmentation.get("apply", True):
             augmentations: list[GeneralTransformation] = (
-                GeneralTransformationFactory.create(augmentation.model_dump())
+                GeneralTransformationFactory.create(augmentation.get("augmentations"))
             )
             self.datasets = [
                 d.compose(AugmentedDataset, augmentations=augmentations)
@@ -63,10 +61,13 @@ class BaseDataModule(pl.LightningDataModule, DLCM):
         # Dataloaders
         self.dataloaders: dict[str, BaseDataloader] = {}
         for dataloader_mode, dataloader_config in dataloaders.items():
-            dataloader_config["params"] |= common_dataloader_params
-            self.dataloaders[dataloader_mode](
-                DataloadersFactory.create(dataloader_config)
+            dataloader_config["params"] |= (
+                common_dataloader_params if common_dataloader_params else {}
             )
+            self.dataloaders[dataloader_mode] = DataloadersFactory.create(
+                dataloader_config
+            )
+        self.extra_attributes = extra if extra else {}
 
     def train_dataloader(self):
         return self.dataloaders.get("train")
