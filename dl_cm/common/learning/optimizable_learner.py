@@ -11,7 +11,7 @@ class OptimizableLearner(BaseLearner):
     def __init__(
         self,
         optimizers: OneOrMany[Union[namedEntitySchema, "BaseOptimizer"]],
-        lr_schedulers: OneOrMany[Union[namedEntitySchema, "BaseLrScheduler"]],
+        lr_schedulers: OneOrMany[Union[namedEntitySchema, "BaseLrScheduler"]] = None,
         *args,
         **kwargs,
     ):

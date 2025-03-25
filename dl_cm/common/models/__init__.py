@@ -16,7 +16,8 @@ class BaseModel(torch.nn.Module, DLCM, ABC):
         return MODELS_REGISTERY
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        torch.nn.Module.__init__(self)
+        DLCM.__init__(self, *args, **kwargs)
 
     @abstractmethod
     def forward(self, x):
@@ -42,3 +43,8 @@ class ModelsFactory(BaseFactory[BaseModel]):
     @classmethod
     def default_instance(cls) -> BaseModel:
         return IdModel()
+
+
+from . import samples
+
+__all__ = ["samples", "BaseModel", "IdModel", "ModelsFactory"]

@@ -6,9 +6,9 @@ from dl_cm.common.models import BaseModel
 
 
 class SemanticSegmentationModel(BaseModel):
-    def __init__(self, model_config: dict, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.model = smp.create_model(**model_config)
+        self.model = smp.create_model(*args, **kwargs)
 
     @classmethod
     def get_prediction_schema(cls) -> pd.BaseModel:

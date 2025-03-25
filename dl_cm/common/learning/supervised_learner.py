@@ -4,7 +4,7 @@ from dl_cm.common.typing import StepInputStruct, StepOutputStruct, lossOutputStr
 
 class SupervisedLearner(CriterionLearner):
     def __init__(self, target_key: str, predicted_key: str, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.target_key: str = target_key
         self.predicted_key: str = predicted_key
 
