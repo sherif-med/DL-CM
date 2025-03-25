@@ -7,13 +7,25 @@ from matplotlib import pyplot as plt
 from matplotlib.widgets import Slider
 from skimage.io import imread
 
-from dl_cm.common.datasets import BaseDataset
-from dl_cm.common.datasets.filtered_dataset import FilteredItemsDataset
-from dl_cm.common.datasets.images_dataset import (
+from dl_cm.common.data.datasets import BaseDataset
+from dl_cm.common.data.datasets.filtered_dataset import FilteredItemsDataset
+from dl_cm.common.data.datasets.images_dataset import (
     FilesWithinDirectoryDataset,
     ImagesWithinDirectoryDataset,
 )
-from dl_cm.common.datasets.items_dataset import CrossDataset
+from dl_cm.common.data.datasets.items_dataset import CrossDataset
+from dl_cm.common.data.transformations.general_transformation import (
+    GeneralTransformation,
+)
+from dl_cm.common.data.transformations.multiple_items_transformation import (
+    MultipleItemRevrsibleTransformation,
+)
+from dl_cm.common.data.transformations.tensor_transformation import (
+    Transflip,
+    TransRot90,
+    TransRot180,
+    TransRot270,
+)
 from dl_cm.common.typing import StepInputStruct
 
 
@@ -120,6 +132,59 @@ class VocDataset(BaseDataset):
 
     def __len__(self):
         return len(self.cross_dataset)
+
+
+class VocPreprocessing(GeneralTransformation):
+    def __init__(self):
+        id_fn = lambda item: item
+        super().__init__(id_fn)
+
+
+transformable_items_names = (
+    "image",
+    "label",
+)
+
+
+class VocTransRot90(MultipleItemRevrsibleTransformation):
+    def __init__(
+        self, spatial_dims=(-2, -1), transformable_items_names=transformable_items_names
+    ):
+        MultipleItemRevrsibleTransformation.__init__(
+            self, TransRot90(spatial_dims), included_keys=transformable_items_names
+        )
+
+
+class VocTransRot180(MultipleItemRevrsibleTransformation):
+    def __init__(
+        self, spatial_dims=(-2, -1), transformable_items_names=transformable_items_names
+    ):
+        MultipleItemRevrsibleTransformation.__init__(
+            self, TransRot180(spatial_dims), transformable_items_names
+        )
+
+
+class VocTransRot270(MultipleItemRevrsibleTransformation):
+    def __init__(
+        self, spatial_dims=(-2, -1), transformable_items_names=transformable_items_names
+    ):
+        MultipleItemRevrsibleTransformation.__init__(
+            self, TransRot270(spatial_dims), transformable_items_names
+        )
+
+
+class VocTransFlipud(MultipleItemRevrsibleTransformation):
+    def __init__(self, transformable_items_names=transformable_items_names):
+        MultipleItemRevrsibleTransformation.__init__(
+            self, Transflip(-2), transformable_items_names
+        )
+
+
+class VocTransFliplr(MultipleItemRevrsibleTransformation):
+    def __init__(self, transformable_items_names=transformable_items_names):
+        MultipleItemRevrsibleTransformation.__init__(
+            self, Transflip(-1), transformable_items_names
+        )
 
 
 if __name__ == "__main__":
