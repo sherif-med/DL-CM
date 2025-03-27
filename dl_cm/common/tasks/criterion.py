@@ -22,7 +22,7 @@ def base_loss_adapter(loss_cls: type[nn.modules.loss._Loss]):
         def __init__(self, *args, **kwargs):
             """Wraps a loss to extract values from dictionary inputs."""
             loss_cls.__init__(self, *args, **kwargs)
-            BaseLoss.__init__(self, *args, **kwargs)
+            BaseLoss.__init__(self)
 
         @staticmethod
         def adapt_output_struct(output_loss):
@@ -53,6 +53,9 @@ def base_loss_adapter(loss_cls: type[nn.modules.loss._Loss]):
             target_tensor = target[self.target_key] if self.target_key else target
             loss_output = super().forward(pred_tensor, target_tensor)
             return self.adapt_output_struct(loss_output)
+
+        def as_metric_collection(self) -> MetricCollection:
+            return MetricCollection({loss_cls.__name__: MeanMetric()})
 
     return WrappedLoss
 
@@ -125,7 +128,9 @@ class CombinedLoss(BaseLoss):
         # Adding child losses to the metric collection
         loss_fn: BaseLoss
         for loss_fn in self.losses:
-            metric_collection.add_metrics(loss_fn.as_metric_collection())
+            c_loss_metric_collection = loss_fn.as_metric_collection()
+            for k, v in c_loss_metric_collection.items():
+                metric_collection[k] = v
         return metric_collection
 
 
