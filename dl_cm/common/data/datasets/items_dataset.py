@@ -1,5 +1,6 @@
 import collections
 import collections.abc
+import numbers
 from typing import Any, Callable
 
 from dl_cm.common.data.datasets import (
@@ -132,7 +133,7 @@ class CrossDataset(BaseDataset):
         return len(self.relative_indices)
 
     def __getitem__(self, index: int | slice) -> dict[str, Any] | dict[str, list[Any]]:
-        if isinstance(index, int):
+        if isinstance(index, numbers.Integral):
             cross_dataset_indices: tuple[int] | list[tuple[int]] = (
                 self.relative_indices[index]
             )
@@ -147,4 +148,4 @@ class CrossDataset(BaseDataset):
             loaded_slice = [self.__getitem__(i) for i in sub_indices]
             return loaded_slice
         else:
-            raise OutOfTypesException(index, (int, slice))
+            raise OutOfTypesException(index, (numbers.Integral, slice))
