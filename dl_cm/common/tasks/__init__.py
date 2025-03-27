@@ -4,7 +4,7 @@ import torch
 from dl_cm.common import DLCM
 from dl_cm.common.learning import LearnersFactory
 from dl_cm.common.learning.optimizable_learner import OptimizableLearner
-from dl_cm.common.typing import namedEntitySchema
+from dl_cm.common.typing import StepInputStruct, StepOutputStruct, namedEntitySchema
 from dl_cm.utils.ppattern.factory import BaseFactory
 from dl_cm.utils.registery import Registry
 
@@ -31,9 +31,12 @@ class BaseTask(pl.LightningModule, DLCM):
         self.save_hyperparameters(kwargs)
 
     def configure_optimizers(self):
-        optimizer = self.learner.optimizers
-        lr_scheduler = self.learner.lr_schedulers
-        return [optimizer], [lr_scheduler]
+        optimizers = self.learner.optimizers
+        lr_schedulers = self.learner.lr_schedulers
+        if lr_schedulers:
+            return optimizers, lr_schedulers
+        else:
+            return optimizers
 
     @staticmethod
     def load_from_checkpoint(ckpt_path: str, **kwargs) -> "BaseTask":
@@ -43,6 +46,22 @@ class BaseTask(pl.LightningModule, DLCM):
         del ckpt
         loaded_task = task_class.load_from_checkpoint(ckpt_path, **kwargs)
         return loaded_task
+
+    def step(self, batch: StepInputStruct, compute_loss=True) -> StepOutputStruct:
+        step_output = self.learner.forward(batch, compute_loss=compute_loss)
+        return step_output
+
+    def training_step(self, batch: StepInputStruct) -> StepOutputStruct:
+        step_output = self.step(batch)
+        return step_output
+
+    def validation_step(self, batch: StepInputStruct) -> StepOutputStruct:
+        step_output = self.step(batch)
+        return step_output
+
+    def predict_step(self, batch: StepInputStruct) -> StepOutputStruct:
+        step_output = self.step(batch, compute_loss=False)
+        return step_output
 
 
 class TasksFactory(BaseFactory[BaseTask]):
