@@ -11,7 +11,7 @@ def load_trainer(
     callbacks: list[namedEntitySchema | baseCallback] = [],
     loggers: list[namedEntitySchema | BaseLogger] = [],
     plugins: list[namedEntitySchema | BasePlugin] = [],
-) -> None:
+) -> pl.Trainer:
     callbacks = CallbacksFactory.create(callbacks)
     loggers = LoggersFactory.create(loggers)
     plugins = PluginsFactory.create(plugins)

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pydantic as pd
 import pytorch_lightning as pl
 
@@ -28,8 +30,6 @@ class LoggingOptions(pd.BaseModel):
 
 
 class MetricsLoggingCallback(baseCallback):
-    metric_track_callback: metricTrackCallback
-
     def __init__(
         self,
         defaults=defaulLoggingOptions(),
@@ -40,6 +40,7 @@ class MetricsLoggingCallback(baseCallback):
     ):
         super().__init__(*args, **kwargs)
         self.default_logging_flags = defaults
+        self._metric_track_callback: Optional[metricTrackCallback] = None
         self.logging_flags: LoggingOptions = {
             "train": {
                 **{
@@ -75,14 +76,14 @@ class MetricsLoggingCallback(baseCallback):
         all_callbacks = trainer.callbacks
         for callback in all_callbacks:
             if isinstance(callback, metricTrackCallback):
-                if not self.metric_track_callback:
-                    self.metric_track_callback = callback
+                if not self._metric_track_callback:
+                    self._metric_track_callback = callback
                 else:
                     logger.warning(
                         "Multiple metricTrackCallbacks found in trainer callbacks"
                     )
 
-        if not self.metric_track_callback:
+        if not self._metric_track_callback:
             logger.critical("No metricTrackCallback found in trainer callbacks")
 
     def on_train_batch_end(
@@ -93,7 +94,7 @@ class MetricsLoggingCallback(baseCallback):
         batch,
         batch_idx: int,
     ) -> None:
-        if not self.metric_track_callback:
+        if not self._metric_track_callback:
             logger.warning(
                 "No metricTrackCallback found in trainer callbacks! Not logging metrics"
             )
@@ -102,13 +103,13 @@ class MetricsLoggingCallback(baseCallback):
         for (
             metric_name,
             metric,
-        ) in self.metric_track_callback.binary_train_metrics.items():
+        ) in self._metric_track_callback.binary_train_metrics.items():
             self.log(pl_module, f"train_{metric_name}", metric, "train")
         # Loss metrics logging
         for (
             metric_name,
             metric,
-        ) in self.metric_track_callback.loss_train_metrics.items():
+        ) in self._metric_track_callback.loss_train_metrics.items():
             self.log(pl_module, f"train_{metric_name}", metric, "train")
 
     def on_validation_batch_end(
@@ -119,7 +120,7 @@ class MetricsLoggingCallback(baseCallback):
         batch,
         batch_idx: int,
     ) -> None:
-        if not self.metric_track_callback:
+        if not self._metric_track_callback:
             logger.warning(
                 "No metricTrackCallback found in trainer callbacks! Not logging metrics"
             )
@@ -128,11 +129,11 @@ class MetricsLoggingCallback(baseCallback):
         for (
             metric_name,
             metric,
-        ) in self.metric_track_callback.binary_valid_metrics.items():
+        ) in self._metric_track_callback.binary_valid_metrics.items():
             self.log(pl_module, f"valid_{metric_name}", metric, "valid")
         # Loss metrics logging
         for (
             metric_name,
             metric,
-        ) in self.metric_track_callback.loss_valid_metrics.items():
+        ) in self._metric_track_callback.loss_valid_metrics.items():
             self.log(pl_module, f"valid_{metric_name}", metric, "valid")
