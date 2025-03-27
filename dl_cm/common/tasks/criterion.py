@@ -7,7 +7,7 @@ from dl_cm.common import DLCM
 from dl_cm.common.typing import lossOutputStruct, namedEntitySchema
 from dl_cm.utils.exceptions import OutOfTypesException
 from dl_cm.utils.ppattern.factory import BaseFactory
-from dl_cm.utils.ppattern.named_mixin import NamedMixin
+from dl_cm.utils.ppattern.named_mixin import NamedInstanceMixin
 from dl_cm.utils.registery import Registry
 
 CRITIREON_REGISTRY = Registry("Critireon")
@@ -57,7 +57,7 @@ def base_loss_adapter(loss_cls: type[nn.modules.loss._Loss]):
     return WrappedLoss
 
 
-class BaseLoss(NamedMixin, DLCM):
+class BaseLoss(NamedInstanceMixin, DLCM):
     @staticmethod
     def registry() -> Registry:
         return CRITIREON_REGISTRY
@@ -68,7 +68,7 @@ class BaseLoss(NamedMixin, DLCM):
         self.target_key = target_key
 
     def as_metric_collection(self) -> MetricCollection:
-        return MetricCollection({self.name(): MeanMetric()})
+        return MetricCollection({self.instance_name(): MeanMetric()})
 
 
 class CombinedLoss(BaseLoss):
@@ -114,14 +114,14 @@ class CombinedLoss(BaseLoss):
         # Iterate over each loss function and corresponding weight
         for loss_fn, weight in zip(self.losses, self.weights):
             c_loss_value = loss_fn(prediction, target)
-            losses_dict[loss_fn.name()] = c_loss_value
+            losses_dict[loss_fn.instance_name()] = c_loss_value
             total_loss += c_loss_value * weight
-        losses_dict[self.name()] = total_loss
-        return lossOutputStruct(name=self.name(), losses=losses_dict)
+        losses_dict[self.instance_name()] = total_loss
+        return lossOutputStruct(name=self.instance_name(), losses=losses_dict)
 
     def as_metric_collection(self):
         # Adding current loss to the metric collection
-        metric_collection = MetricCollection({self.name(): MeanMetric()})
+        metric_collection = MetricCollection({self.instance_name(): MeanMetric()})
         # Adding child losses to the metric collection
         loss_fn: BaseLoss
         for loss_fn in self.losses:
