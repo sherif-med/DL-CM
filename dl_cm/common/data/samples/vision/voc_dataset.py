@@ -1,4 +1,6 @@
+import numbers
 import os
+from functools import partial
 from pathlib import Path
 
 import numpy as np
@@ -6,6 +8,7 @@ import torch
 from matplotlib import pyplot as plt
 from matplotlib.widgets import Slider
 from skimage.io import imread
+from torchvision.transforms import Resize
 
 from dl_cm.common.data.datasets import BaseDataset
 from dl_cm.common.data.datasets.filtered_dataset import FilteredItemsDataset
@@ -71,10 +74,10 @@ class VocDataset(BaseDataset):
             hash_fns=lambda x: Path(x).stem,
         )
 
-    def __getitem__(self, index: int | slice):
-        if isinstance(index, int):
+    def __getitem__(self, index: numbers.Integral | slice):
+        if isinstance(index, numbers.Integral):
             cross_items = self.cross_dataset[index]
-            input_dict = {"image": torch.from_numpy(imread(cross_items[0]))}
+            input_dict = {"image": torch.from_numpy(imread(cross_items[0])).float()}
             target_dict = {
                 "label": self.convert_to_segmentation_mask(
                     torch.from_numpy(imread(cross_items[1]))
@@ -135,9 +138,19 @@ class VocDataset(BaseDataset):
 
 
 class VocPreprocessing(GeneralTransformation):
-    def __init__(self):
-        id_fn = lambda item: item
-        super().__init__(id_fn)
+    @staticmethod
+    def item_images_resize(item: StepInputStruct, resize_operator) -> StepInputStruct:
+        item["inputs"]["image"] = resize_operator(item["inputs"]["image"].T)
+        item["targets"]["label"] = resize_operator(item["targets"]["label"].T)
+        return item
+
+    def __init__(self, image_size=(256, 256)):
+        resize_operator = Resize(image_size)
+        super().__init__(
+            partial(
+                VocPreprocessing.item_images_resize, resize_operator=resize_operator
+            )
+        )
 
 
 transformable_items_names = (
