@@ -7,6 +7,7 @@ from dl_cm.common.data.base_dataloader import BaseDataloader, DataloadersFactory
 from dl_cm.common.data.datasets import BaseDataset, DatasetFactory
 from dl_cm.common.data.datasets.augmented_dataset import AugmentedDataset
 from dl_cm.common.data.datasets.preprocessed_dataset import PreprocessedDataset
+from dl_cm.common.data.datasets.split_datasets import SplitDataset
 from dl_cm.common.data.transformations.general_transformation import (
     GeneralTransformation,
     GeneralTransformationFactory,
@@ -38,31 +39,50 @@ class BaseDataModule(pl.LightningDataModule, DLCM):
     ):
         super().__init__()
         # Datasets loading
-        self.datasets: list[BaseDataset] = DatasetFactory.create(datasets)
+        loaded_datasets: list[BaseDataset] = DatasetFactory.create(datasets)
+        self.datasets: dict[str, BaseDataset] = {}
+        for c_dataset in loaded_datasets:
+            # Add parts of splitDataset
+            if isinstance(c_dataset, SplitDataset):
+                self.datasets |= {
+                    d_reference_name: c_dataset.get_dataset_by_ref_name(
+                        d_reference_name
+                    )
+                    for d_reference_name in c_dataset.reference_names
+                }
+            # Add dataset as whole
+            else:
+                self.datasets[c_dataset.reference_name] = c_dataset
+
         # Data preprocessing
         preprocessing = FlaggedNamedEntity(**preprocessing)
         if preprocessing.apply:
             preprocessing_fn: GeneralTransformation = (
                 GeneralTransformationFactory.create(preprocessing)
             )
-            self.datasets = [
-                d.compose(PreprocessedDataset, preprocessing_fn=preprocessing_fn)
-                for d in self.datasets
-            ]
+            for c_dataset_ref_name, c_dataset in self.datasets.items():
+                self.datasets[c_dataset_ref_name] = c_dataset.compose(
+                    PreprocessedDataset, preprocessing_fn=preprocessing_fn
+                )
+
         # Data augmentation
         if augmentation.get("apply", True):
             augmentations: list[GeneralTransformation] = (
                 GeneralTransformationFactory.create(augmentation.get("augmentations"))
             )
-            self.datasets = [
-                d.compose(AugmentedDataset, augmentations=augmentations)
-                for d in self.datasets
-            ]
+            for c_dataset_ref_name, c_dataset in self.datasets.items():
+                self.datasets[c_dataset_ref_name] = c_dataset.compose(
+                    AugmentedDataset, augmentations=augmentations
+                )
+
         # Dataloaders
         self.dataloaders: dict[str, BaseDataloader] = {}
         for dataloader_mode, dataloader_config in dataloaders.items():
             dataloader_config["params"] |= (
                 common_dataloader_params if common_dataloader_params else {}
+            )
+            dataloader_config["params"]["dataset"] = self.datasets.get(
+                dataloader_config["params"].pop("dataset_reference_name")
             )
             self.dataloaders[dataloader_mode] = DataloadersFactory.create(
                 dataloader_config

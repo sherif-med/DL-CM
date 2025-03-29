@@ -12,7 +12,6 @@ from dl_cm.utils.ppattern.factory import BaseFactory
 from dl_cm.utils.registery import Registry
 
 DATASETS_REGISTERY = Registry("Datasets")
-LOADED_DATASETS_REGISTRY = Registry("Loaded datasets")
 
 COMPOSITION_DATASET_CLASS = TypeVar(
     "COMPOSITION_DATASET_CLASS_T", bound="CompositionDataset"
@@ -36,9 +35,6 @@ class BaseDataset(DLCM):
             reference_name = f"{self.__class__.__name__}_{BaseDataset._non_ref_datasets_counter[self.__class__]}"
             BaseDataset._non_ref_datasets_counter[self.__class__] += 1
         self._ref_name = reference_name
-        if reference_name in LOADED_DATASETS_REGISTRY:
-            raise ValueError(f"Dataset with name {reference_name} is already loaded")
-        LOADED_DATASETS_REGISTRY.register(obj=self, name=self._ref_name)
 
     @property
     def reference_name(self) -> str:

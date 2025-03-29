@@ -1,6 +1,5 @@
 import torch
 
-from dl_cm.common.data.datasets import LOADED_DATASETS_REGISTRY
 from dl_cm.common.data.samplers import SamplersFactory
 from dl_cm.common.functions import FunctionsFactory
 from dl_cm.utils.ppattern.factory import BaseFactory
@@ -17,8 +16,8 @@ class BaseDataloader:
         "pin_memory_device": FunctionsFactory,
     }
 
-    def __init__(self, dataset_reference_name: str, *args, **kwargs):
-        self.dataset_reference_name = dataset_reference_name
+    def __init__(self, *args, **kwargs):
+        pass
 
     @classmethod
     def instantiate_params(cls, params: dict) -> dict:
@@ -47,11 +46,7 @@ def base_dataloader_adapter(dataloader_cls: type):
     class WrappedDataloader(dataloader_cls, BaseDataloader):
         def __init__(self: BaseDataloader, *args, **kwargs):
             """Wraps a data loader to pop unused arguments and instantiate params."""
-            BaseDataloader.__init__(self, *args, **kwargs)
-            kwargs["dataset"] = LOADED_DATASETS_REGISTRY.get(
-                self.dataset_reference_name
-            )
-            kwargs.pop("dataset_reference_name")
+            BaseDataloader.__init__(self)
             # instantiate object params
             kwargs = self.instantiate_params(kwargs)
             dataloader_cls.__init__(self, **kwargs)
