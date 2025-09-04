@@ -32,9 +32,11 @@ class metricTrackCallback(baseCallback):
         Initializes the metrics collections for training and validation.
         This method sets up the general metrics for both training and validation phases.
         """
-        metrics = metrics if isinstance(metrics, list) else [metrics]
+        metrics: List[BaseMetric] = metrics if isinstance(metrics, list) else [metrics]
         # General metrics (train)
-        train_metrics = MetricCollection(metrics, prefix="train_")
+        train_metrics = MetricCollection(
+            {m.instance_name__(): m for m in metrics}, prefix="train_"
+        )
         if self.binary_train_metrics is None:
             self.binary_train_metrics = train_metrics
         else:
@@ -94,7 +96,7 @@ class metricTrackCallback(baseCallback):
         dataloader_idx: int = 0,
     ) -> None:
         self.binary_valid_metrics.update(
-            preds=outputs.predictions, target=outputs.targets
+            preds=outputs["predictions"], target=batch["targets"]
         )
         if isinstance(outputs.loss, dict):
             for loss_name, loss_value in outputs.loss.items():
