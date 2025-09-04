@@ -24,7 +24,7 @@ class OptimizableLearner(BaseLearner):
         self._lr_schedulers: BaseLrScheduler = []
         if isinstance(lr_schedulers, list):
             self._lr_schedulers = lr_schedulers
-        else:
+        elif isinstance(lr_schedulers, BaseLrScheduler):
             self._lr_schedulers = [lr_schedulers]
 
     def init_optimizer(

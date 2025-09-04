@@ -127,8 +127,8 @@ class VocDataset(BaseDataset):
         else:
             for ax in axs:
                 ax.clear()
-        axs[0].imshow(item["inputs"]["image"])
-        axs[1].imshow(item["inputs"]["image"])
+        axs[0].imshow(item["inputs"]["image"].int())
+        axs[1].imshow(item["inputs"]["image"].int())
         axs[1].imshow(np.argmax(item["targets"]["label"], axis=-1), alpha=0.4)
         axs[2].imshow(np.argmax(item["targets"]["label"], axis=-1))
         plt.show()

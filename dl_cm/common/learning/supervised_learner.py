@@ -9,7 +9,7 @@ class SupervisedLearner(CriterionLearner):
         self.predicted_key: str = predicted_key
 
     def forward(self, batch: StepInputStruct, compute_loss=True) -> StepOutputStruct:
-        predictions = self.model()(batch["inputs"])
+        predictions = self.model(batch["inputs"])
         if compute_loss:
             targets = batch["targets"]
             loss_dict = self.criteron_step(targets, predictions)
@@ -21,5 +21,5 @@ class SupervisedLearner(CriterionLearner):
     def criteron_step(self, targets: dict, predictions: dict) -> lossOutputStruct:
         target = targets[self.target_key]
         predicted = predictions[self.predicted_key]
-        loss_dict = self.criterion(predicted, target)
+        loss_dict = self.criterion.forward(predicted, target)
         return loss_dict

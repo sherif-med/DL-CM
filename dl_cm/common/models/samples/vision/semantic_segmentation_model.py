@@ -6,9 +6,10 @@ from dl_cm.common.models import BaseModel
 
 
 class SemanticSegmentationModel(BaseModel):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, input_key, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.model = smp.create_model(*args, **kwargs)
+        self.input_key = input_key
 
     @classmethod
     def get_prediction_schema(cls) -> pd.BaseModel:
@@ -18,5 +19,5 @@ class SemanticSegmentationModel(BaseModel):
         return PredictionSchema
 
     def forward(self, input):
-        seg_map = self.model(input)
+        seg_map = self.model(input[self.input_key])
         return {"seg_map": seg_map}
