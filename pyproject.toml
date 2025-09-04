@@ -6,10 +6,12 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "click>=8.1.8",
-    "lightning>=2.5.0.post0",
-    "matplotlib>=3.10.0",
+    "lightning>=2.5.1",
+    "matplotlib==3.10.0",
+    "numpy==2.2.3",
     "pydantic>=2.10.6",
     "scikit-image>=0.25.2",
+    "segmentation-models-pytorch==0.4.0",
     "tensorboardx>=2.6.2.2",
     "torch>=2.6.0",
     "torchmetrics>=1.6.1",
@@ -20,6 +22,15 @@ dependencies = [
 name = "pytorch-cu126"
 url = "https://download.pytorch.org/whl/cu126"
 explicit = true
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu126", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchvision = [
+  { index = "pytorch-cu126", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+
 
 [tool.uv]
 package = true
