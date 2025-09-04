@@ -21,7 +21,8 @@ class DLCM(registeredClassMixin):
         class WrappedClass(external_cls, base_cls, wrapped_name=external_cls.__name__):
             def __init__(self, *args, **kwargs):
                 external_cls.__init__(self, *args, **kwargs)
-                base_cls.__init__(self, *args, **kwargs)
+                base_cls.__init__(self)
+                # base_cls.__init__(self, *args, **kwargs)
 
         return WrappedClass
 
