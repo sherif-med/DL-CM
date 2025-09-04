@@ -19,7 +19,6 @@ datamodule:
     extra: map(any(), required=False)
 
 trainer:
-  name: registered_trainer()
   params: map(any(), required=False)
   callbacks: list(include('callback'))
   loggers: list(include('logger'))
