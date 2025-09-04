@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from collections import defaultdict
 
 
@@ -12,3 +13,9 @@ class NamedInstanceMixin:
             return (
                 f"{self.__class__.__name__}_{self._instance_count[self.__class__] - 1}"
             )
+
+
+class UniqueInstanceIdentifierMixin(ABC):
+    @abstractmethod
+    def instance_name__(self) -> str:
+        """"""
