@@ -19,10 +19,12 @@ def base_loss_adapter(loss_cls: type[nn.modules.loss._Loss]):
     """
 
     class WrappedLoss(loss_cls, BaseLoss):
-        def __init__(self, *args, **kwargs):
+        def __init__(
+            self, preds_key: str = None, target_key: str = None, *args, **kwargs
+        ):
             """Wraps a loss to extract values from dictionary inputs."""
             loss_cls.__init__(self, *args, **kwargs)
-            BaseLoss.__init__(self)
+            BaseLoss.__init__(self, preds_key, target_key)
 
         @staticmethod
         def adapt_output_struct(output_loss):
@@ -70,6 +72,8 @@ class BaseLoss(NamedInstanceMixin, DLCM):
         self.preds_key = preds_key
         self.target_key = target_key
 
+    # TODO ADD forward abtractmethod
+
     def as_metric_collection(self) -> MetricCollection:
         return MetricCollection({self.instance_name(): MeanMetric()})
 
@@ -116,7 +120,7 @@ class CombinedLoss(BaseLoss):
         total_loss = 0.0
         # Iterate over each loss function and corresponding weight
         for loss_fn, weight in zip(self.losses, self.weights):
-            c_loss_value = loss_fn(prediction, target)
+            c_loss_value = loss_fn(prediction, target).value()
             losses_dict[loss_fn.instance_name()] = c_loss_value
             total_loss += c_loss_value * weight
         losses_dict[self.instance_name()] = total_loss
