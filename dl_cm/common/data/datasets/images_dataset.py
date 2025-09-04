@@ -4,7 +4,7 @@ import os
 from functools import partial
 
 import torch
-from pydantic import DirectoryPath, validate_call
+from pydantic import DirectoryPath
 from skimage.io import imread
 
 from dl_cm.common.data.datasets import (
@@ -17,7 +17,6 @@ from dl_cm.common.data.datasets.items_dataset import ItemsDataset
 
 
 class FilesWithinDirectoryDataset(ItemsDataset):
-    @validate_call
     def __init__(self, directory_path: DirectoryPath, *args, **kwargs):
         items_paths = glob.glob(os.path.join(directory_path, "*"))
         super().__init__(items=items_paths, *args, **kwargs)

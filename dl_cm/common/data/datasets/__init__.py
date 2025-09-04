@@ -4,8 +4,6 @@ from collections import defaultdict
 from functools import cached_property
 from typing import Generic, Type, TypeVar
 
-from pydantic import ConfigDict, validate_call
-
 from dl_cm.common import DLCM
 from dl_cm.common.typing import namedEntitySchema
 from dl_cm.utils.ppattern.factory import BaseFactory
@@ -25,7 +23,6 @@ class BaseDataset(DLCM):
     def registry() -> Registry:
         return DATASETS_REGISTERY
 
-    @validate_call
     def __init__(
         self, reference_name: str = None, is_in_memory=False, *args, **kwargs
     ) -> None:
@@ -79,7 +76,6 @@ TOP_DATASET_CLASS = TypeVar("TOP_DATASET_CLASS", bound=BaseDataset)
 class CompositionDataset(
     BaseDataset, ABC, Generic[COMPOSED_DATASET_CLASS, TOP_DATASET_CLASS]
 ):
-    @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
     def __init__(
         self,
         parent_dataset: namedEntitySchema | COMPOSED_DATASET_CLASS,
