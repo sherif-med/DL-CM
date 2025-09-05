@@ -77,3 +77,19 @@ class GeneralRevrsibleTransformation(GeneralTransformation):
 
     def __rwd__(self, *args):
         return self.__rwd__fn__(*args)
+
+
+class SupervisionTransformation:
+    """
+    Applies transformation on Inputs and Target keys
+    """
+
+    def __init__(self):
+        self._supervision_keys = ("inputs", "targets")
+
+    def __call__(self, item, **kwargs):
+        out_item = {}
+        for s_k in self._supervision_keys:
+            if s_k in item:
+                out_item[s_k] = super().__call__(item[s_k], **kwargs)
+        return out_item

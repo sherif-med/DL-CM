@@ -1,7 +1,7 @@
 import bisect
 import itertools
 
-from dl_cm.common.datasets import BaseDataset, DatasetFactory
+from dl_cm.common.data.datasets import BaseDataset, DatasetFactory
 from dl_cm.common.typing import namedEntitySchema
 
 

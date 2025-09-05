@@ -18,6 +18,7 @@ from dl_cm.common.data.datasets.items_dataset import ItemsDataset
 
 class FilesWithinDirectoryDataset(ItemsDataset):
     def __init__(self, directory_path: DirectoryPath, *args, **kwargs):
+        assert os.path.isdir(directory_path), "Folder not found"
         items_paths = glob.glob(os.path.join(directory_path, "*"))
         super().__init__(items=items_paths, *args, **kwargs)
 
