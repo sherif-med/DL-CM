@@ -8,7 +8,7 @@ from dl_cm.common.tasks import BaseTask
 from dl_cm.common.tasks.criterion import BaseLoss
 from dl_cm.common.tasks.metrics import BaseMetric, MetricsFactory
 from dl_cm.common.trainer.callbacks import baseCallback
-from dl_cm.common.typing import StepOutputStruct, namedEntitySchema
+from dl_cm.common.typing import StepOutputStruct, namedEntitySchema, lossOutputStruct
 
 
 class metricTrackCallback(baseCallback):
@@ -26,6 +26,10 @@ class metricTrackCallback(baseCallback):
         if isinstance(pl_module.learner, CriterionLearner):
             self.task_learner_criterion = pl_module.learner.criterion
             self.extend_loss_metrics(pl_module.learner.criterion)
+        self.binary_train_metrics.to(pl_module.device)
+        self.binary_valid_metrics.to(pl_module.device)
+        self.loss_train_metrics.to(pl_module.device)
+        self.loss_valid_metrics.to(pl_module.device)
 
     def extend_binary_metrics(self, metrics: BaseMetric | List[BaseMetric]):
         """
@@ -35,8 +39,11 @@ class metricTrackCallback(baseCallback):
         metrics: List[BaseMetric] = metrics if isinstance(metrics, list) else [metrics]
         # General metrics (train)
         train_metrics = MetricCollection(
-            {m.instance_name__(): m for m in metrics}, prefix="train_"
+            {m.instance_name(): m for m in metrics}, prefix="train_"
         )
+        # TEMP
+        train_metrics = train_metrics.clone(prefix="train_")
+
         if self.binary_train_metrics is None:
             self.binary_train_metrics = train_metrics
         else:
@@ -75,15 +82,15 @@ class metricTrackCallback(baseCallback):
         batch,
         batch_idx: int,
     ) -> None:
-        self.binary_train_metrics.update(
-            preds=outputs.predictions, target=outputs.targets
-        )
-        if isinstance(outputs.loss, dict):
-            for loss_name, loss_value in outputs.loss.items():
+        #self.binary_train_metrics.update(
+        #    preds=outputs["predictions"], target=batch["targets"]
+        #)
+        if isinstance(outputs["losses"], lossOutputStruct):
+            for loss_name, loss_value in outputs["losses"].losses.items():
                 self.loss_train_metrics[loss_name].update(loss_value)
         else:
             self.loss_train_metrics[self.task_learner_criterion.name()].update(
-                outputs.loss
+                outputs["loss"]
             )
 
     def on_validation_batch_end(
@@ -98,12 +105,12 @@ class metricTrackCallback(baseCallback):
         self.binary_valid_metrics.update(
             preds=outputs["predictions"], target=batch["targets"]
         )
-        if isinstance(outputs.loss, dict):
-            for loss_name, loss_value in outputs.loss.items():
+        if isinstance(outputs["losses"], lossOutputStruct):
+            for loss_name, loss_value in outputs["losses"].losses.items():
                 self.loss_valid_metrics[loss_name].update(loss_value)
         else:
-            self.loss_valid_metrics[self.task_learner_criterion.name()].update(
-                outputs.loss
+            self.loss_valid_metrics[self.task_learner_criterion.instance_name()].update(
+                outputs["loss"]
             )
 
     def on_train_epoch_end(
