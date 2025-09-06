@@ -26,6 +26,15 @@ def base_loss_adapter(loss_cls: type[nn.modules.loss._Loss]):
             loss_cls.__init__(self, *args, **kwargs)
             BaseLoss.__init__(self, preds_key, target_key)
 
+        def instance_name(self):
+            if self._instance_count[loss_cls] == 0:
+                return loss_cls.__name__
+            else:
+                self._instance_count[loss_cls] += 1
+                return (
+                    f"{loss_cls.__name__}_{self._instance_count[loss_cls] - 1}"
+                )
+
         @staticmethod
         def adapt_output_struct(output_loss):
             if isinstance(output_loss, lossOutputStruct):
