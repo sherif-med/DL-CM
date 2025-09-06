@@ -37,3 +37,5 @@ def get_schema_path():
     return schema_path
 
 DEFAULT_SCHEMA_PATH = get_schema_path()
+
+from .third_party_integration import *
