@@ -12,10 +12,12 @@ class SupervisedLearner(CriterionLearner):
         predictions = self.model(batch["inputs"])
         if compute_loss:
             targets = batch["targets"]
-            loss_dict = self.criteron_step(targets, predictions)
+            loss_struct = self.criteron_step(targets, predictions)
+            loss_value = loss_struct.value()
         else:
-            loss_dict = {}
-        output = {"predictions": predictions, "loss": loss_dict}
+            loss_struct = {}
+            loss_value = None
+        output = {"predictions": predictions, "loss": loss_value, "losses": loss_struct}
         return output
 
     def criteron_step(self, targets: dict, predictions: dict) -> lossOutputStruct:

@@ -25,7 +25,8 @@ class lossOutputStruct:
 
 @dataclass
 class StepOutputStruct:
-    loss: lossOutputStruct | torch.Tensor
+    loss: torch.Tensor
+    losses: lossOutputStruct
     predictions: dict[str, Any] | torch.Tensor
     targets: dict[str, Any] | torch.Tensor = None
     inputs: dict | torch.Tensor = None

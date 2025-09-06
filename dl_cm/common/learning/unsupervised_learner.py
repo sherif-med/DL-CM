@@ -10,10 +10,12 @@ class UnsupervisedLearner(CriterionLearner):
     def forward(self, batch: StepInputStruct, compute_loss=True) -> StepOutputStruct:
         predictions = self.model()(batch["inputs"])
         if compute_loss:
-            loss_dict = self.criteron_step(predictions)
+            loss_struct = self.criteron_step(predictions)
+            loss_value = loss_struct.value()
         else:
-            loss_dict = {}
-        output = {"predictions": predictions, "loss": loss_dict}
+            loss_struct = {}
+            loss_value = None
+        output = {"predictions": predictions, "loss": loss_value, "losses":loss_struct}
         return output
 
     def criteron_step(self, predictions: dict) -> lossOutputStruct:
