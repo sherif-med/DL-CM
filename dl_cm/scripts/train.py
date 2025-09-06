@@ -62,7 +62,7 @@ def train(config_path: str, ckpt_path: str, seed: int = -1):
     loaded_datamodule = DataModulesFactory.create(config.get("datamodule"))
     loaded_trainer = load_trainer(**config.get("trainer"))
     loaded_task = TasksFactory.create(config.get("task"))
-    loaded_task.to("cuda")
+    loaded_task.to(loaded_trainer.strategy.root_device)
     loaded_trainer.fit(loaded_task, datamodule=loaded_datamodule, ckpt_path=ckpt_path)
 
 
