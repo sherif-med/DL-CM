@@ -104,13 +104,13 @@ class MetricsLoggingCallback(baseCallback):
             metric_name,
             metric,
         ) in self._metric_track_callback.binary_train_metrics.items():
-            self.log(pl_module, f"train_{metric_name}", metric, "train")
+            self.log(metric_name, metric.compute(), "train")
         # Loss metrics logging
         for (
             metric_name,
             metric,
         ) in self._metric_track_callback.loss_train_metrics.items():
-            self.log(pl_module, f"train_{metric_name}", metric, "train")
+            self.log(metric_name, metric.compute(), "train")
 
     def on_validation_batch_end(
         self,
@@ -130,10 +130,10 @@ class MetricsLoggingCallback(baseCallback):
             metric_name,
             metric,
         ) in self._metric_track_callback.binary_valid_metrics.items():
-            self.log(pl_module, f"valid_{metric_name}", metric, "valid")
+            self.log(metric_name, metric.compute(), "valid")
         # Loss metrics logging
         for (
             metric_name,
             metric,
         ) in self._metric_track_callback.loss_valid_metrics.items():
-            self.log(pl_module, f"valid_{metric_name}", metric, "valid")
+            self.log(metric_name, metric.compute(), "valid")
