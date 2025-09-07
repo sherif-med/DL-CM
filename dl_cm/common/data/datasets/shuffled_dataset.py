@@ -18,7 +18,7 @@ class ShuffledDataset(CompositionDataset[COMPOSED_DATASET_CLASS, TOP_DATASET_CLA
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        if isinstance(shuffled_indices, (collections.abc.Iterable[int], np.ndarray)):
+        if isinstance(shuffled_indices, (collections.abc.Iterable, np.ndarray)):
             shuffled_indices = np.array(shuffled_indices)
         else:
             shuffled_indices = np.random.permutation(len(self.parent_dataset))
