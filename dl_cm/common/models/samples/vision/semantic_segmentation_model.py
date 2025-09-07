@@ -23,5 +23,5 @@ class SemanticSegmentationModel(BaseModel):
 
     def forward(self, input):
         seg_map = self.model(input[self.input_key])
-        label_map = seg_map.argmax(dim=1)
+        label_map = torch.softmax(seg_map,1).argmax(dim=1)
         return {self.seg_output_key: seg_map, self.label_output_key:label_map}

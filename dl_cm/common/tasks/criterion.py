@@ -87,7 +87,7 @@ class BaseLoss(NamedInstanceMixin, DLCM):
         return MetricCollection({self.instance_name(): MeanMetric()})
 
 
-class CombinedLoss(BaseLoss):
+class CombinedLoss(BaseLoss, nn.Module):
     def __init__(
         self,
         losses: list[str, namedEntitySchema, BaseLoss],
@@ -107,7 +107,8 @@ class CombinedLoss(BaseLoss):
         :return:
         """
 
-        super().__init__(*args, **kwargs)
+        BaseLoss.__init__(self, *args, **kwargs)
+        nn.Module.__init__(self)
         losses = CritireonFactory.create(losses)
         self.losses: list[BaseLoss] = nn.ModuleList(losses)
 
