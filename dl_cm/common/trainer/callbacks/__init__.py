@@ -25,18 +25,23 @@ class CallbacksFactory(BaseFactory[baseCallback]):
 from pytorch_lightning.callbacks import LearningRateFinder, LearningRateMonitor
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 from pytorch_lightning.callbacks.progress import TQDMProgressBar
+from pytorch_lightning.callbacks import BasePredictionWriter
 
 _ = DLCM.base_class_adapter(TQDMProgressBar, base_cls=baseCallback)
 _ = DLCM.base_class_adapter(ModelCheckpoint, base_cls=baseCallback)
 _ = DLCM.base_class_adapter(LearningRateFinder, base_cls=baseCallback)
 _ = DLCM.base_class_adapter(LearningRateMonitor, base_cls=baseCallback)
+_ = DLCM.base_class_adapter(BasePredictionWriter, base_cls=baseCallback)
 
 from .metric_logging_callback import MetricsLoggingCallback
 from .metric_track_callback import metricTrackCallback
+from .prediction_writer import ImagesPredictionWriter, PostPredictionCallback
 
 __all__ = [
     "baseCallback",
     "CallbacksFactory",
     "MetricsLoggingCallback",
     "metricTrackCallback",
+    "ImagesPredictionWriter",
+    "PostPredictionCallback"
 ]
