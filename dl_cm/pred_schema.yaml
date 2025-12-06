@@ -7,9 +7,6 @@ datamodule:
       apply: bool(required=False)
       name: registered_transformation(required=False)
       params: map(any(), required=False)
-    augmentation:
-      apply: bool(required=False)
-      augmentations: list(include('named_entity'))
     datasets: list(include('dataset'))
     common_dataloader_params: map(key=str(), required=False)
     dataloaders: map(include('dataloader'), key=enum("train", "valid", "test", "predict"))
@@ -18,15 +15,6 @@ datamodule:
 trainer:
   params: map(any(), required=False)
   callbacks: list(include('callback'))
-  loggers: list(include('logger'))
-  #experiment_name: str()
-  #experiment_checkpoint_directory: str()
-  #experiment_logging_directory: str()
-
-task:
-  name: registered_task()
-  params:
-    learner: include('learner')
 
 # Define reusable components
 ---
@@ -37,7 +25,6 @@ dataset:
 
 dataloader:
   name: str()
-  #dataset_reference_name: str()
   params: map(any(), required=False)
 
 callback:
@@ -50,20 +37,6 @@ logger:
 
 learner:
   name: registered_learner()
-  params: map(any(), required=False)
-  #model: include('model')
-  #optimizer: include("optimizer")
-  #lr_scheduler: include("lr_scheduler", required=False)
-  #critireon:
-  #  name: registered_critireon()
-  #  params: map(any(), required=False)
-
-optimizer:
-  name: registered_optimizer()
-  params: map(any(), required=False)
-
-lr_scheduler:
-  name: registered_scheduler()
   params: map(any(), required=False)
 
 model:

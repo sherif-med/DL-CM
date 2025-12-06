@@ -1,6 +1,7 @@
 #
 import logging
 import os
+from pathlib import Path
 
 PACKAGE_LOGGER_NAME = "dl_cm_logger"
 _logger = logging.getLogger(PACKAGE_LOGGER_NAME)
@@ -37,5 +38,6 @@ def get_schema_path():
     return schema_path
 
 DEFAULT_SCHEMA_PATH = get_schema_path()
+PREDICTION_SCHEMA_PATH = Path(DEFAULT_SCHEMA_PATH).with_name("pred_schema.yaml")
 
 from .third_party_integration import *
