@@ -32,8 +32,8 @@ class BaseDataModule(pl.LightningDataModule, DLCM):
         self,
         datasets: list[BaseDataset | namedEntitySchema],
         dataloaders: dict[str, namedEntitySchema | BaseDataloader],
-        preprocessing: dict,
-        augmentation: dict,
+        preprocessing: Optional[dict] = None,
+        augmentation: Optional[dict] = None,
         common_dataloader_params: Optional[dict] = None,
         extra: Optional[dict] = None,
     ):
@@ -55,8 +55,7 @@ class BaseDataModule(pl.LightningDataModule, DLCM):
                 self.datasets[c_dataset.reference_name] = c_dataset
 
         # Data preprocessing
-        preprocessing = FlaggedNamedEntity(**preprocessing)
-        if preprocessing.apply:
+        if preprocessing and preprocessing.get("apply", True):
             preprocessing_fn: GeneralTransformation = (
                 GeneralTransformationFactory.create(preprocessing)
             )
@@ -66,7 +65,7 @@ class BaseDataModule(pl.LightningDataModule, DLCM):
                 )
 
         # Data augmentation
-        if augmentation.get("apply", True):
+        if augmentation and augmentation.get("apply", True):
             augmentations: list[GeneralTransformation] = (
                 GeneralTransformationFactory.create(augmentation.get("augmentations"))
             )
