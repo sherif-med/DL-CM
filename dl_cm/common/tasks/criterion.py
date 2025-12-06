@@ -160,3 +160,11 @@ for name in dir(nn.modules.loss):
         CRITIREON_REGISTRY.register(
             obj=attr, name=name, base_class_adapter=base_loss_adapter
         )
+
+import segmentation_models_pytorch as smp
+for name in dir(smp.losses):
+    attr = getattr(smp.losses, name)
+    if isinstance(attr, type) and issubclass(attr, nn.modules.loss._Loss):
+        CRITIREON_REGISTRY.register(
+            obj=attr, name=name, base_class_adapter=base_loss_adapter
+        )
