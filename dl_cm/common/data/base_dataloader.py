@@ -39,8 +39,7 @@ class BaseDataloader:
 
 
 def base_dataloader_adapter(dataloader_cls: type):
-    """Decorator to make any external loss inherit from BaseLoss
-    and adapt output to lossOutputStruct
+    """Decorator to make any external dataloader inherit from BaseDataloader
     """
 
     class WrappedDataloader(dataloader_cls, BaseDataloader):
