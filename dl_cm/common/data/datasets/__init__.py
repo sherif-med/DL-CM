@@ -12,7 +12,7 @@ from dl_cm.utils.registery import Registry
 DATASETS_REGISTERY = Registry("Datasets")
 
 COMPOSITION_DATASET_CLASS = TypeVar(
-    "COMPOSITION_DATASET_CLASS_T", bound="CompositionDataset"
+    "COMPOSITION_DATASET_CLASS", bound="CompositionDataset"
 )
 
 
@@ -156,6 +156,7 @@ from .preprocessed_dataset import PreprocessedDataset
 from .shuffled_dataset import ShuffledDataset
 from .split_datasets import SplitDataset
 from .sub_dataset import SubDataset
+from .folder_dataset import ListDirectoryDataset, FilesWithinDirectoryDataset
 
 __all__ = [
     "AugmentedDataset",
@@ -170,4 +171,6 @@ __all__ = [
     "SubDataset",
     "UniqueItemsDataset",
     "IdentityCompositionDataset",
+    "ListDirectoryDataset",
+    "FilesWithinDirectoryDataset",
 ]
