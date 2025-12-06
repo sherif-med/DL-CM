@@ -1,6 +1,4 @@
 import collections
-import glob
-import os
 from functools import partial
 
 import torch
@@ -13,14 +11,7 @@ from dl_cm.common.data.datasets import (
     CompositionDataset,
 )
 from dl_cm.common.data.datasets.filtered_dataset import FilteredItemsDataset
-from dl_cm.common.data.datasets.items_dataset import ItemsDataset
-
-
-class FilesWithinDirectoryDataset(ItemsDataset):
-    def __init__(self, directory_path: DirectoryPath, *args, **kwargs):
-        assert os.path.isdir(directory_path), "Folder not found"
-        items_paths = glob.glob(os.path.join(directory_path, "*"))
-        super().__init__(items=items_paths, *args, **kwargs)
+from dl_cm.common.data.datasets.folder_dataset import ListDirectoryDataset
 
 
 DEFAULT_IMAGES_EXTENSIONS = tuple([".tif", ".jpeg", ".png", "jpg"])
@@ -45,7 +36,7 @@ class ImagesWithinDirectoryDataset(
                 ImagesWithinDirectoryDataset.is_image_fp,
                 image_extensions=image_extensions,
             ),
-            parent_dataset=FilesWithinDirectoryDataset(directory_path=directory_path),
+            parent_dataset=ListDirectoryDataset(directory_path=directory_path),
         )
         super().__init__(parent_dataset=parent_dataset, *args, **kwargs)
 

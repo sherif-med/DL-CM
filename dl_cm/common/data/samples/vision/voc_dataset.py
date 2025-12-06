@@ -12,10 +12,8 @@ from torchvision.transforms import Resize
 
 from dl_cm.common.data.datasets import BaseDataset
 from dl_cm.common.data.datasets.filtered_dataset import FilteredItemsDataset
-from dl_cm.common.data.datasets.images_dataset import (
-    FilesWithinDirectoryDataset,
-    ImagesWithinDirectoryDataset,
-)
+from dl_cm.common.data.datasets.images_dataset import ImagesWithinDirectoryDataset
+from dl_cm.common.data.datasets.folder_dataset import ListDirectoryDataset
 from dl_cm.common.data.datasets.items_dataset import CrossDataset
 from dl_cm.common.data.transformations.general_transformation import (
     GeneralTransformation,
@@ -61,11 +59,11 @@ class VocDataset(BaseDataset):
         super().__init__(*args, **kwargs)
         target_dir = os.path.join(root_dir, "SegmentationClass")
         images_dir = os.path.join(root_dir, "JPEGImages")
-        self.images_path_dataset = FilesWithinDirectoryDataset(
+        self.images_path_dataset = ListDirectoryDataset(
             directory_path=images_dir
         ).compose(FilteredItemsDataset, ImagesWithinDirectoryDataset.is_image_fp)
 
-        self.target_path_dataset = FilesWithinDirectoryDataset(
+        self.target_path_dataset = ListDirectoryDataset(
             directory_path=target_dir
         ).compose(FilteredItemsDataset, ImagesWithinDirectoryDataset.is_image_fp)
 
