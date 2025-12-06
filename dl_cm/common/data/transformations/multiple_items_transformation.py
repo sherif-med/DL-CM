@@ -13,32 +13,51 @@ def is_iterable(v):
 
 class MultipleItemRevrsibleTransformation(GeneralRevrsibleTransformation):
     
-    def __init__(self, parent_transformation : GeneralRevrsibleTransformation,
-                 included_keys:Optional[Union[Iterable,Callable]]=None,
-                 ignored_keys:Optional[Union[Iterable,Callable]]=None):
-        self.parent_transformation=parent_transformation
+    def __init__(self, parent_transformation: GeneralRevrsibleTransformation,
+                 included_keys: Optional[Union[Iterable, Callable]] = None,
+                 ignored_keys: Optional[Union[Iterable, Callable]] = None):
+        self.parent_transformation = parent_transformation
         
-        if bool(included_keys) and bool(ignored_keys):
+        if included_keys is not None and ignored_keys is not None:
             raise Exception("Include and exclude arguments are provided at the same time")
         
+        # Store the original data instead of closures
+        self._included_callable = None
+        self._included_set = None
+        self._ignored_callable = None
+        self._ignored_set = None
+        self._always_include = False
+        
         if callable(included_keys):
-            self.included_keys=included_keys
+            self._included_callable = included_keys
         elif is_iterable(included_keys):
-            included_keys = set(included_keys)
-            self.included_keys = lambda x: x in included_keys
+            self._included_set = set(included_keys)
         elif included_keys is None:
             if ignored_keys is None:
-                self.included_keys = lambda x:True
+                self._always_include = True
             elif callable(ignored_keys):
-                self.included_keys = lambda x: not ignored_keys(v)
+                self._ignored_callable = ignored_keys
             elif is_iterable(ignored_keys):
-                ignored_keys = set(ignored_keys)
-                self.included_keys = lambda x: x not in ignored_keys
+                self._ignored_set = set(ignored_keys)
             else:
                 raise OutOfTypesException(ignored_keys, (Callable, Iterable))
         else:
             raise OutOfTypesException(included_keys, (Callable, Iterable))
-                
+    
+    def included_keys(self, x):
+        """Check if key should be included"""
+        if self._always_include:
+            return True
+        if self._included_callable:
+            return self._included_callable(x)
+        if self._included_set is not None:
+            return x in self._included_set
+        if self._ignored_callable:
+            return not self._ignored_callable(x)
+        if self._ignored_set is not None:
+            return x not in self._ignored_set
+        return True
+        
     def __fwd__(self, items_dict:dict):
         out_items_dict = {}
         for k,v in items_dict.items():
