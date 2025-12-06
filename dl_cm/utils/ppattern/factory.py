@@ -81,7 +81,9 @@ class BaseFactory(Generic[T], ABC):
             return cls.default_instance()
         if isinstance(param, str):
             dataset_class = cls.registry().get(param)
-            return dataset_class()
+            if type(dataset_class) is type:
+                return dataset_class()
+            return dataset_class # callable object does not require instantiated
         elif isinstance(param, namedEntitySchema):
             return load_named_entity(cls.registry(), param)
         elif isinstance(param, dict):
