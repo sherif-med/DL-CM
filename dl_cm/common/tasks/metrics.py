@@ -77,10 +77,17 @@ class MetricsFactory(BaseFactory[BaseMetric]):
     def base_class() -> type[BaseMetric]:
         return BaseMetric
 
-
+import torchmetrics.segmentation
 # Register all torchmetrics metrics
 for name in dir(torchmetrics):
     attr = getattr(torchmetrics, name)
+    if isinstance(attr, type) and issubclass(attr, Metric):
+        METRICS_REGISTRY.register(
+            obj=attr, name=attr.__name__, base_class_adapter=base_metric_adapter
+        )
+
+for name in dir(torchmetrics.segmentation):
+    attr = getattr(torchmetrics.segmentation, name)
     if isinstance(attr, type) and issubclass(attr, Metric):
         METRICS_REGISTRY.register(
             obj=attr, name=attr.__name__, base_class_adapter=base_metric_adapter
