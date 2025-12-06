@@ -1,10 +1,12 @@
 import torchmetrics
 from torchmetrics.metric import Metric
+from typing import Callable
 
 from dl_cm.common import DLCM
 from dl_cm.utils.ppattern.factory import BaseFactory
 from dl_cm.utils.ppattern.named_mixin import NamedInstanceMixin
 from dl_cm.utils.registery import Registry
+from dl_cm.common.functions import FunctionsFactory
 
 METRICS_REGISTRY = Registry("Metrics")
 
@@ -16,6 +18,15 @@ def base_metric_adapter(metric_cls: type[Metric]):
         # Step 1: Instantiate the metric (handles F1Score.__new__)
         preds_key = kwargs.pop("preds_key", None)
         target_key = kwargs.pop("target_key", None)
+        
+        preds_preprocessor = None
+        if "preds_preprocessor" in kwargs:
+            preds_preprocessor:Callable = FunctionsFactory.create(kwargs.pop("preds_preprocessor"))
+        
+        target_preprocessor = None
+        if "target_preprocessor" in kwargs:
+            target_preprocessor:Callable = FunctionsFactory.create(kwargs.pop("target_preprocessor"))
+        
         metric_instance = metric_cls(*args, **kwargs)
 
         # Step 2: Create a dynamic subclass of the *instance’s class*
@@ -32,10 +43,12 @@ def base_metric_adapter(metric_cls: type[Metric]):
 
             def update(self, preds: dict, target: dict = None):
                 pred_tensor = preds[self.preds_key] if self.preds_key else preds
+                pred_tensor = preds_preprocessor(pred_tensor) if preds_preprocessor else pred_tensor
                 if target is None:
                     super().update(pred_tensor)
                     return
                 target_tensor = target[self.target_key] if self.target_key else target
+                target_tensor = target_preprocessor(target_tensor) if target_preprocessor else target_tensor
                 super().update(pred_tensor, target_tensor)
 
         # Step 3: Create a new instance WITHOUT re-calling __init__
