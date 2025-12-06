@@ -31,6 +31,7 @@ from functools import partial
 import yamale
 from pydantic import ConfigDict, validate_call
 from yamale.validators import DefaultValidators, Validator
+from pathlib import Path
 
 from dl_cm import DEFAULT_SCHEMA_PATH
 from dl_cm import _logger as logger
@@ -90,8 +91,8 @@ for key, val_reg in _registries_validators.items():
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def validate_config(
-    config_path: str,
-    schema_path: str = DEFAULT_SCHEMA_PATH,
+    config_path: str | Path,
+    schema_path: str | Path = DEFAULT_SCHEMA_PATH,
     extra_validators: dict[str, Validator] = None,
 ):
     """
