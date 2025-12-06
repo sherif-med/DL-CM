@@ -66,7 +66,7 @@ class BaseTask(pl.LightningModule, DLCM):
 
 class TasksFactory(BaseFactory[BaseTask]):
     @staticmethod
-    def base_class() -> type[BaseTask]:
+    def base_class(similar=False) -> type[BaseTask]:
         return BaseTask
 
 

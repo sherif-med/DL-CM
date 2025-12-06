@@ -65,7 +65,7 @@ class BaseDataset(DLCM):
 
 class DatasetFactory(BaseFactory[BaseDataset]):
     @staticmethod
-    def base_class() -> Type["BaseDataset"]:
+    def base_class(similar=False) -> Type["BaseDataset"]:
         return BaseDataset
 
 

@@ -37,7 +37,7 @@ class IdModel(BaseModel):
 
 class ModelsFactory(BaseFactory[BaseModel]):
     @staticmethod
-    def base_class() -> type[BaseModel]:
+    def base_class(similar=False) -> type[BaseModel]:
         return BaseModel
 
     @classmethod

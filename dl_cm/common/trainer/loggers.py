@@ -16,7 +16,7 @@ class BaseLogger(DLCM):
 
 class LoggersFactory(BaseFactory[BaseLogger]):
     @staticmethod
-    def base_class() -> type[BaseLogger]:
+    def base_class(similar=False) -> type[BaseLogger]:
         return BaseLogger
 
 

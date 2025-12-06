@@ -19,7 +19,9 @@ class BaseSampler(DLCM):
 
 class SamplersFactory(BaseFactory[BaseSampler]):
     @staticmethod
-    def base_class() -> type[BaseSampler]:
+    def base_class(similar=False) -> type[torch.utils.data.Sampler]:
+        if similar:
+            return (BaseSampler, torch.utils.data.Sampler, _IndexBatchSamplerWrapper)
         return BaseSampler
 
 

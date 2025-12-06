@@ -28,7 +28,7 @@ class BaseLearner(torch.nn.Module, DLCM):
 
 class LearnersFactory(BaseFactory[BaseLearner]):
     @staticmethod
-    def base_class() -> type[BaseLearner]:
+    def base_class(similar=False) -> type[BaseLearner]:
         return BaseLearner
 
 

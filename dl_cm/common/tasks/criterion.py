@@ -150,7 +150,9 @@ class CombinedLoss(BaseLoss, nn.Module):
 
 class CritireonFactory(BaseFactory[BaseLoss]):
     @staticmethod
-    def base_class() -> type[BaseLoss]:
+    def base_class(similar=False) -> type[BaseLoss]:
+        if similar:
+            return (BaseLoss, nn.modules.loss._Loss, nn.Module)
         return BaseLoss
 
 

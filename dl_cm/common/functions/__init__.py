@@ -8,5 +8,5 @@ FUNCTIONS_REGISTERY = Registry("Functions")
 
 class FunctionsFactory(BaseFactory[Callable]):
     @staticmethod
-    def base_class() -> Callable:
+    def base_class(similar=False) -> type[BaseCallable]:
         return Callable

@@ -56,7 +56,7 @@ def base_dataloader_adapter(dataloader_cls: type):
 
 class DataloadersFactory(BaseFactory[BaseDataloader]):
     @staticmethod
-    def base_class() -> type["BaseDataloader"]:
+    def base_class(similar=False) -> type["BaseDataloader"]:
         return BaseDataloader
 
 

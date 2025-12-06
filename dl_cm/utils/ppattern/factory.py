@@ -10,6 +10,7 @@ import collections
 import collections.abc
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
+from dl_cm.common.typing import OneOrMany
 
 from dl_cm.common.typing import namedEntitySchema
 from dl_cm.config_loaders import load_named_entity
@@ -35,11 +36,12 @@ class BaseFactory(Generic[T], ABC):
 
     @staticmethod
     @abstractmethod
-    def base_class() -> T:
+    def base_class(similar=False) -> OneOrMany[T]:
         """
         Return the base class associated with the factory.
         This method should be overridden by subclasses to return the specific base class
         that the factory is responsible for creating instances of.
+        - Argument similar allows returning a tuple of similar types, eg: Callable or function is similar to BaseCallable
         """
 
     @classmethod
@@ -88,7 +90,7 @@ class BaseFactory(Generic[T], ABC):
             return load_named_entity(cls.registry(), param)
         elif isinstance(param, dict):
             return load_named_entity(cls.registry(), namedEntitySchema(**param))
-        elif isinstance(param, cls.base_class()):
+        elif isinstance(param, cls.base_class(similar=True)):
             return param
         elif isinstance(param, collections.abc.Sequence):
             return type(param)(cls.create(p) for p in param)

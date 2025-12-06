@@ -18,7 +18,7 @@ class baseCallback(pl.Callback, DLCM):
 
 class CallbacksFactory(BaseFactory[baseCallback]):
     @staticmethod
-    def base_class() -> type[baseCallback]:
+    def base_class(similar=False) -> type[baseCallback]:
         return baseCallback
 
 

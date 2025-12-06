@@ -44,7 +44,7 @@ class GeneralTransformation(DLCM):
 
 class GeneralTransformationFactory(BaseFactory[GeneralTransformation]):
     @staticmethod
-    def base_class() -> type[GeneralTransformation]:
+    def base_class(similar=False) -> type[GeneralTransformation]:
         return GeneralTransformation
 
 

@@ -103,5 +103,5 @@ class BaseDataModule(pl.LightningDataModule, DLCM):
 
 class DataModulesFactory(BaseFactory[BaseDataModule]):
     @staticmethod
-    def base_class() -> type["BaseDataModule"]:
+    def base_class(similar=False) -> type["BaseDataModule"]:
         return BaseDataModule
