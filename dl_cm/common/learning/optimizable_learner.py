@@ -1,4 +1,5 @@
 from typing import Union
+import copy
 
 from dl_cm.common import DLCM
 from dl_cm.common.learning import BaseLearner
@@ -17,6 +18,7 @@ class OptimizableLearner(BaseLearner):
     ):
         super().__init__(*args, **kwargs)
         self._optimizers: BaseOptimizer = []
+        optimizers = copy.deepcopy(optimizers) # Added to seperate optimizer params from config
         if isinstance(optimizers, list):
             self._optimizers = optimizers
         else:
