@@ -39,9 +39,9 @@ class BaseTask(pl.LightningModule, DLCM):
             return optimizers
 
     @staticmethod
-    def load_from_checkpoint(ckpt_path: str, **kwargs) -> "BaseTask":
+    def _load_from_checkpoint(ckpt_path: str, **kwargs) -> "BaseTask":
         ckpt = torch.load(ckpt_path, map_location="cpu")
-        task_name = ckpt["hyper_parameters"]["name"]
+        task_name = ckpt["hyper_parameters"]["task_name"]
         task_class: pl.LightningModule = TASKS_REGISTERY.get(task_name)
         del ckpt
         loaded_task = task_class.load_from_checkpoint(ckpt_path, **kwargs)
