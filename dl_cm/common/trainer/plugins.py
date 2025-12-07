@@ -17,6 +17,8 @@ class BasePlugin(DLCM):
 class PluginsFactory(BaseFactory[BasePlugin]):
     @staticmethod
     def base_class(similar=False) -> type[BasePlugin]:
+        if similar:
+            return (BasePlugin,)
         return BasePlugin
 
 

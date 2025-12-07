@@ -76,6 +76,8 @@ class BaseOptimizer(DLCM):
 class OptimizerFactory(BaseFactory[BaseOptimizer]):
     @staticmethod
     def base_class(similar=False) -> type[BaseOptimizer]:
+        if similar:
+            return (BaseOptimizer,)
         return BaseOptimizer
 
 
@@ -91,6 +93,8 @@ class BaseLrScheduler(DLCM):
 class LrSchedulerFactory(BaseFactory):
     @staticmethod
     def base_class(similar=False) -> type:
+        if similar:
+            return (BaseLrScheduler,)
         return BaseLrScheduler
 
 

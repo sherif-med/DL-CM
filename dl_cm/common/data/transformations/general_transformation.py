@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 
 from dl_cm.common import DLCM
 from dl_cm.utils.ppattern.factory import BaseFactory
@@ -7,7 +8,7 @@ from dl_cm.utils.registery import Registry
 from . import TRANSFORMATION_REGISTRY
 
 
-class GeneralTransformation(DLCM):
+class GeneralTransformation(DLCM, Callable):
     """
     A class representing a general transformation.
 
@@ -45,6 +46,8 @@ class GeneralTransformation(DLCM):
 class GeneralTransformationFactory(BaseFactory[GeneralTransformation]):
     @staticmethod
     def base_class(similar=False) -> type[GeneralTransformation]:
+        if similar:
+            return (GeneralTransformation,)
         return GeneralTransformation
 
 

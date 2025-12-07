@@ -38,6 +38,8 @@ class IdModel(BaseModel):
 class ModelsFactory(BaseFactory[BaseModel]):
     @staticmethod
     def base_class(similar=False) -> type[BaseModel]:
+        if similar:
+            return (BaseModel,)
         return BaseModel
 
     @classmethod

@@ -11,8 +11,9 @@ class BaseCallable(DLCM):
     def registry() -> Registry:
         return FUNCTIONS_REGISTERY
 
-
-class FunctionsFactory(BaseFactory[Callable]):
+class FunctionsFactory(BaseFactory[BaseCallable]):
     @staticmethod
     def base_class(similar=False) -> type[BaseCallable]:
+        if similar:
+            return (BaseCallable,)
         return BaseCallable

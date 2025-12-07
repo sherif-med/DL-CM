@@ -82,15 +82,15 @@ class BaseFactory(Generic[T], ABC):
         if param is None:
             return cls.default_instance()
         if isinstance(param, str):
-            dataset_class = cls.registry().get(param)
-            if type(dataset_class) is type:
-                return dataset_class()
-            return dataset_class # callable object does not require instantiated
+            param_class = cls.registry().get(param)
+            if type(param_class) is type:
+                return param_class()
+            return param_class # callable object does not require instantiated
         elif isinstance(param, namedEntitySchema):
             return load_named_entity(cls.registry(), param)
         elif isinstance(param, dict):
             return load_named_entity(cls.registry(), namedEntitySchema(**param))
-        elif isinstance(param, cls.base_class(similar=True)):
+        elif isinstance(param, cls.base_class(similar=True)) or callable(param):
             return param
         elif isinstance(param, collections.abc.Sequence):
             return type(param)(cls.create(p) for p in param)

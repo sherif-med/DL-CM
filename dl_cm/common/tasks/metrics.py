@@ -75,6 +75,8 @@ class BaseMetric(NamedInstanceMixin, DLCM):
 class MetricsFactory(BaseFactory[BaseMetric]):
     @staticmethod
     def base_class(similar=False) -> type[BaseMetric]:
+        if similar:
+            return (BaseMetric,)
         return BaseMetric
 
 import torchmetrics.segmentation
