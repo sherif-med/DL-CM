@@ -9,7 +9,7 @@ from . import (
 BasePredictionCommand = chain_decorators(
     click.command(),
     config_file_option(),
-    checkpoint_path_option(),
+    checkpoint_path_option(required=True),
 )
 
 # pylint: disable=no-value-for-parameter

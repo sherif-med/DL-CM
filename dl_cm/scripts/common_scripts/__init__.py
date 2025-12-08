@@ -29,9 +29,9 @@ def pytorch_accelerator_option(short_name="-d", long_name="--device")->click.Opt
               help="device to use pytorch operations!")
 
 
-def checkpoint_path_option(short_name="-c", long_name="--ckpt_path")->click.Option:
+def checkpoint_path_option(short_name="-c", long_name="--ckpt_path", **kwargs)->click.Option:
     return click.option(short_name, long_name, type=click.Path(exists=True, dir_okay=False),
-                        help="Checkpoint file path!")
+                        help="Checkpoint file path!", **kwargs)
 
 
 def config_file_option(short_name="-k", long_name="--config_path")->click.Option:
