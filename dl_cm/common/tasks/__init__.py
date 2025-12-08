@@ -27,8 +27,8 @@ class BaseTask(pl.LightningModule, DLCM):
     ):
         super().__init__(*args, **kwargs)
         self.learner: OptimizableLearner = LearnersFactory.create(learner)
-        self.hparams["task_name"] = type(self).__name__
-        self.save_hyperparameters(kwargs)
+        #self.hparams["task_name"] = type(self).__name__
+        self.save_hyperparameters()
 
     def configure_optimizers(self):
         optimizers = self.learner.optimizers
