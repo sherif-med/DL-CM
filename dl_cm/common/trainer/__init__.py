@@ -1,4 +1,4 @@
-import pytorch_lightning as pl
+import lightning as pl
 
 from dl_cm.common.trainer.callbacks import CallbacksFactory, baseCallback
 from dl_cm.common.trainer.loggers import BaseLogger, LoggersFactory

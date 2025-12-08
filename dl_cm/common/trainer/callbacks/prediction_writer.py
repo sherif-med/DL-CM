@@ -1,6 +1,6 @@
 from pathlib import Path
 from skimage.io import imsave
-from pytorch_lightning.callbacks import BasePredictionWriter, Callback
+from lightning.pytorch.callbacks import BasePredictionWriter, Callback
 from dl_cm.common.trainer.callbacks import baseCallback
 import os
 

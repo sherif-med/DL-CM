@@ -1,6 +1,6 @@
 from typing import List
 
-import pytorch_lightning as pl
+import lightning as pl
 from torchmetrics import MetricCollection
 
 from dl_cm.common.learning.criterion_learner import CriterionLearner

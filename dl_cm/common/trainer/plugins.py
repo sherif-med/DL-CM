@@ -22,7 +22,7 @@ class PluginsFactory(BaseFactory[BasePlugin]):
         return BasePlugin
 
 
-import pytorch_lightning.plugins as pl_plugins
+import lightning.pytorch.plugins as pl_plugins
 
 for name in dir(pl_plugins):
     attr = getattr(pl_plugins, name)

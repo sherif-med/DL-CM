@@ -1,6 +1,6 @@
 from typing import Optional
 
-import pytorch_lightning as pl
+import lightning as pl
 
 from dl_cm.common import DLCM
 from dl_cm.common.data.base_dataloader import BaseDataloader, DataloadersFactory

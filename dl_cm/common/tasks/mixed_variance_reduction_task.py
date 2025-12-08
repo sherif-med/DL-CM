@@ -1,6 +1,6 @@
 
 from typing import Any, List
-from pytorch_lightning import LightningModule
+from lightning import LightningModule
 from dl_cm.common.datasets.transformations.general_transformation import GeneralRevrsibleTransformation, GeneralTransformationFactory
 from dl_cm.common.tasks.base_task import BaseTask
 

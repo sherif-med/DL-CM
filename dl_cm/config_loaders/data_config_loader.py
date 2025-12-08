@@ -4,7 +4,7 @@ from dl_cm.common.datasets.preprocessed_dataset import PreprocessedDataset, PREP
 from dl_cm.common.datasets.samplers import SAMPLER_REGISTRY
 from dl_cm.common.datasets.split_datasets import split_subdatasets_random
 from torch.utils.data import DataLoader
-import pytorch_lightning as pl
+import lightning as pl
 from dl_cm import _logger
 from functools import partial
 from dl_cm.common.datasets.datamodule import PartialDataModule

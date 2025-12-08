@@ -1,4 +1,4 @@
-from pytorch_lightning.callbacks import Callback
+from lightning.pytorch.callbacks import Callback
 import zipfile
 import os
 from dl_cm import _logger

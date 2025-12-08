@@ -1,4 +1,4 @@
-import pytorch_lightning as pl
+import lightning as pl
 
 from dl_cm.common import DLCM
 from dl_cm.utils.ppattern.factory import BaseFactory
@@ -23,11 +23,10 @@ class CallbacksFactory(BaseFactory[baseCallback]):
             return (baseCallback,)
         return baseCallback
 
-
-from pytorch_lightning.callbacks import LearningRateFinder, LearningRateMonitor
-from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
-from pytorch_lightning.callbacks.progress import TQDMProgressBar
-from pytorch_lightning.callbacks import BasePredictionWriter
+from lightning.pytorch.callbacks import LearningRateFinder, LearningRateMonitor
+from lightning.pytorch.callbacks.model_checkpoint import ModelCheckpoint
+from lightning.pytorch.callbacks.progress import TQDMProgressBar
+from lightning.pytorch.callbacks import BasePredictionWriter
 
 _ = DLCM.base_class_adapter(TQDMProgressBar, base_cls=baseCallback)
 _ = DLCM.base_class_adapter(ModelCheckpoint, base_cls=baseCallback)

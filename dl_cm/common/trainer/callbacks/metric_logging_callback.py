@@ -1,7 +1,7 @@
 from typing import Optional
 
 import pydantic as pd
-import pytorch_lightning as pl
+import lightning as pl
 
 from dl_cm import _logger as logger
 from dl_cm.common.tasks import BaseTask

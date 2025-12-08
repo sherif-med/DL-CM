@@ -1,6 +1,6 @@
 import torch
 import torch.utils.data.sampler
-from pytorch_lightning.overrides.distributed import _IndexBatchSamplerWrapper
+from lightning.pytorch.overrides.distributed import _IndexBatchSamplerWrapper
 
 from dl_cm.common import DLCM
 from dl_cm.utils.ppattern.factory import BaseFactory

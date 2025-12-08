@@ -27,7 +27,7 @@ Example
 """
 
 # pylint: disable=no-value-for-parameter
-from pytorch_lightning import seed_everything
+from lightning import seed_everything
 
 from dl_cm.common.data.datamodule import DataModulesFactory
 from dl_cm.common.tasks import BaseTask

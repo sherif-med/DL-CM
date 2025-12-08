@@ -22,7 +22,7 @@ class LoggersFactory(BaseFactory[BaseLogger]):
         return BaseLogger
 
 
-import pytorch_lightning.loggers as pl_loggers
+import lightning.pytorch.loggers as pl_loggers
 
 for name in dir(pl_loggers):
     attr = getattr(pl_loggers, name)

@@ -1,5 +1,5 @@
 
-from pytorch_lightning import LightningModule, Trainer
+from lightning import LightningModule, Trainer
 from skimage.io import imsave
 from dl_cm.common.trainers.callbacks.prediction_writer import PostPredictionCallback
 from collections.abc import Iterable, Callable
